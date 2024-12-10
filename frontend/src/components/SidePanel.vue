@@ -14,6 +14,15 @@
         @select="onEmployeeUpload"
       />
     </div>
+    <div v-if="employeeData.length > 0" class="data-visualize-icon">
+      <Button
+        icon="pi pi-table"
+        class="p-button-text"
+        @click="showEmployeeDialog = true"
+        label="View employee data"
+        raised
+      />
+    </div>
 
     <div class="bus-file-upload">
       <label for="busFile">Bus File:</label>
@@ -29,6 +38,15 @@
           <span>Drag and drop the bus file here to upload.</span>
         </template>
       </FileUpload>
+    </div>
+    <div v-if="busData.length > 0" class="data-visualize-icon">
+      <Button
+        icon="pi pi-table"
+        class="p-button-text"
+        @click="showBusDialog = true"
+        label="View Bus Data"
+        raised
+      />
     </div>
 
     <p>
@@ -79,14 +97,71 @@
       class="next-button"
       @click="goToNextStep"
     />
+
+    <Dialog
+      header="Employee data"
+      v-model:visible="showEmployeeDialog"
+      maximizable
+      :modal="true"
+      :draggable="false"
+      :resizable="false"
+      :transitionOptions="{ transition: 'fade' }"
+    >
+      <DataTable
+        showGridlines
+        stripedRows
+        paginator
+        :rows="10"
+        scrollable
+        scrollHeight="flex"
+        :value="employeeData"
+        :size="large"
+        :rowsPerPageOptions="[10, 20, 50]"
+        tableStyle="min-width: 50rem"
+      >
+        <Column field="ID" header="ID"></Column>
+        <Column field="Latitude" header="Latitude"></Column>
+        <Column field="Longitude" header="Longitude"></Column>
+      </DataTable>
+    </Dialog>
+
+    <Dialog
+      header="Bus data"
+      v-model:visible="showBusDialog"
+      maximizable
+      :modal="true"
+      :draggable="false"
+      :resizable="false"
+      :transitionOptions="{ transition: 'fade' }"
+    >
+      <DataTable
+        showGridlines
+        stripedRows
+        paginator
+        :rows="10"
+        scrollable
+        scrollHeight="flex"
+        :value="busData"
+        :size="large"
+        :rowsPerPageOptions="[10, 20, 50]"
+        tableStyle="min-width: 50rem"
+      >
+        <Column field="ID" header="ID"></Column>
+        <Column field="Latitude" header="Latitude"></Column>
+        <Column field="Longitude" header="Longitude"></Column>
+      </DataTable>
+    </Dialog>
   </div>
 </template>
 
 <script>
 import FileUpload from "primevue/fileupload";
 import InputNumber from "primevue/inputnumber";
-import Divider from 'primevue/divider';
+import Divider from "primevue/divider";
 import Button from "primevue/button";
+import Dialog from "primevue/dialog";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
 import * as XLSX from "xlsx";
 
 export default {
@@ -96,6 +171,9 @@ export default {
     InputNumber,
     Button,
     Divider,
+    Dialog,
+    DataTable,
+    Column,
   },
   data() {
     return {
@@ -103,6 +181,8 @@ export default {
       companyLongitude: null,
       employeeData: [],
       busData: [],
+      showEmployeeDialog: false,
+      showBusDialog: false,
     };
   },
   methods: {
@@ -114,15 +194,21 @@ export default {
         const workbook = XLSX.read(data, { type: "array" });
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-        this[dataProperty] = jsonData;
+
+        const normalizedData = jsonData.map((item) => ({
+          ID: item.id,
+          Latitude: item.lat,
+          Longitude: item.lon,
+        }));
+        this[dataProperty] = normalizedData;
       };
       reader.readAsArrayBuffer(file);
     },
     onEmployeeUpload(event) {
-      this.handleFileUpload(event, 'employeeData');
+      this.handleFileUpload(event, "employeeData");
     },
     onBusUpload(event) {
-      this.handleFileUpload(event, 'busData');
+      this.handleFileUpload(event, "busData");
     },
     goToNextStep() {
       // Implement navigation to the next step
@@ -170,5 +256,9 @@ label {
 .custom-divider {
   width: 60%;
   margin: 1rem auto;
+}
+
+.data-visualize-icon {
+  margin-top: 0.5rem;
 }
 </style>
