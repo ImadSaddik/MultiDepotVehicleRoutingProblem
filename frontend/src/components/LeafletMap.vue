@@ -18,8 +18,15 @@ export default {
   mounted() {
     this.map = L.map("map").setView(this.centerCoordinates, this.zoomLevel);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
+      attribution:
+        "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
+      attributionControl: false,
     }).addTo(this.map);
+    L.control
+      .attribution({
+        position: "bottomleft",
+      })
+      .addTo(this.map);
   },
 };
 </script>
