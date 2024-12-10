@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Toast position="bottom-left" />
     <h1>Routing solver</h1>
     <h2>Employee and bus coordinates</h2>
 
@@ -68,6 +69,7 @@
         useGrouping="false"
         inputId="companyLatitude"
         suffix="°"
+        :invalid="isLatitudeInvalid"
         :mode="'decimal'"
         :minFractionDigits="0"
         :maxFractionDigits="10"
@@ -84,6 +86,7 @@
         useGrouping="false"
         suffix="°"
         :mode="'decimal'"
+        :invalid="isLongitudeInvalid"
         :minFractionDigits="0"
         :maxFractionDigits="10"
         :min="-180"
@@ -162,6 +165,7 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import Toast from "primevue/toast";
 import * as XLSX from "xlsx";
 
 export default {
@@ -174,6 +178,7 @@ export default {
     Dialog,
     DataTable,
     Column,
+    Toast,
   },
   data() {
     return {
@@ -183,6 +188,8 @@ export default {
       busData: [],
       showEmployeeDialog: false,
       showBusDialog: false,
+      isLatitudeInvalid: false,
+      isLongitudeInvalid: false,
     };
   },
   methods: {
@@ -211,7 +218,53 @@ export default {
       this.handleFileUpload(event, "busData");
     },
     goToNextStep() {
-      // Implement navigation to the next step
+      let isValid = true;
+      const errors = [];
+
+      this.isLatitudeInvalid = false;
+      this.isLongitudeInvalid = false;
+
+      if (!this.employeeData.length) {
+        errors.push("Please upload employee data file");
+        isValid = false;
+      }
+
+      if (!this.busData.length) {
+        errors.push("Please upload bus data file");
+        isValid = false;
+      }
+
+      if (this.companyLatitude === null) {
+        this.isLatitudeInvalid = true;
+        errors.push("Please provide company latitude");
+        isValid = false;
+      }
+
+      if (this.companyLongitude === null) {
+        this.isLongitudeInvalid = true;
+        errors.push("Please provide company longitude");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        this.$toast.add({
+          severity: "error",
+          summary: "Validation errors",
+          detail: errors.join('\n'),
+          life: 5000,
+          contentStyle: { whiteSpace: 'pre-wrap' },
+          unstyled: false,
+        });
+        return;
+      }
+
+      this.$toast.add({
+        severity: "success",
+        summary: "Success",
+        detail: "Proceeding to next step",
+        life: 3000,
+      });
+      // TODO: Implement actual navigation
     },
   },
 };
@@ -260,5 +313,9 @@ label {
 
 .data-visualize-icon {
   margin-top: 0.5rem;
+}
+
+.p-invalid {
+  border-color: var(--red-500) !important;
 }
 </style>
