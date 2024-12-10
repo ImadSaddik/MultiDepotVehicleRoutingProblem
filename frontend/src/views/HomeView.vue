@@ -1,11 +1,21 @@
 <template>
-  Hi
+  <LeafletMap />
 </template>
 
 <script>
+import LeafletMap from '@/components/LeafletMap.vue';
+
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   components: {
-  }
-}
+    LeafletMap,
+  },
+  data() {
+    return {
+    };
+  },
+};
 </script>
+
+<style scoped>
+</style>
