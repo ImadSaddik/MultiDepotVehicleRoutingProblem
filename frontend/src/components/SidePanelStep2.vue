@@ -1,5 +1,6 @@
 <template>
   <div class="step-container">
+    <h1>Routing solver</h1>
     <h2>Data visualization</h2>
 
     <div class="navigation-buttons">
@@ -34,10 +35,10 @@ export default {
   },
   methods: {
     goToNextStep() {
-      this.$emit('next-step');
+      this.$emit("next-step");
     },
     goToPreviousStep() {
-      this.$emit('previous-step');
+      this.$emit("previous-step");
     },
   },
   watch: {},

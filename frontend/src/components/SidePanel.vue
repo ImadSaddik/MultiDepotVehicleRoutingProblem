@@ -13,22 +13,22 @@
 </template>
 
 <script>
-import SidePanelStep1 from './SidePanelStep1.vue';
-import SidePanelStep2 from './SidePanelStep2.vue';
+import SidePanelStep1 from "./SidePanelStep1.vue";
+import SidePanelStep2 from "./SidePanelStep2.vue";
 
 export default {
   name: "SidePanel",
   components: {
     SidePanelStep1,
-    SidePanelStep2
+    SidePanelStep2,
   },
   data() {
     return {
       currentStep: 1,
       employeeData: [],
       busData: [],
-      companyLocation: {}
-    }
+      companyLocation: {},
+    };
   },
   methods: {
     handleStep1Complete(data) {
@@ -43,7 +43,7 @@ export default {
     handlePreviousStep() {
       this.currentStep--;
     },
-  }
+  },
 };
 </script>
 
