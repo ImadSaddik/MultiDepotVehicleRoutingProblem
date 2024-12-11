@@ -77,6 +77,7 @@
         :max="90"
       />
     </div>
+
     <div class="longitude-input-container">
       <label for="companyLongitude">Longitude:</label>
       <InputNumber
@@ -97,6 +98,7 @@
     <Button
       label="Next"
       icon="pi pi-arrow-right"
+      iconPos="right"
       class="next-button"
       @click="goToNextStep"
     />
