@@ -6,6 +6,8 @@
     />
     <SidePanelStep2
       v-show="currentStep === 2"
+      :employeeData="employeeData"
+      :busData="busData"
       @next-step="handleNextStep"
       @previous-step="handlePreviousStep"
     />
