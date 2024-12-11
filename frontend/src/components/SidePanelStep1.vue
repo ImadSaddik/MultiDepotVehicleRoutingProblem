@@ -272,13 +272,6 @@ export default {
 </script>
 
 <style scoped>
-.step-container {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  padding: 1rem;
-}
-
 .employees-file-upload,
 .bus-file-upload,
 .latitude-input-container,
