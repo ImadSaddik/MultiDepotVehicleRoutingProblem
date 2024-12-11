@@ -6,6 +6,8 @@
     />
     <SidePanelStep2
       v-show="currentStep === 2"
+      @next-step="handleNextStep"
+      @previous-step="handlePreviousStep"
     />
   </div>
 </template>
@@ -34,7 +36,13 @@ export default {
       this.busData = data.busData;
       this.companyLocation = data.companyLocation;
       this.currentStep++;
-    }
+    },
+    handleNextStep() {
+      this.currentStep++;
+    },
+    handlePreviousStep() {
+      this.currentStep--;
+    },
   }
 };
 </script>
