@@ -4,20 +4,25 @@
       v-show="currentStep === 1"
       @next-step="handleStep1Complete"
     />
+    <SidePanelStep2
+      v-show="currentStep === 2"
+    />
   </div>
 </template>
 
 <script>
 import SidePanelStep1 from './SidePanelStep1.vue';
+import SidePanelStep2 from './SidePanelStep2.vue';
 
 export default {
   name: "SidePanel",
   components: {
     SidePanelStep1,
+    SidePanelStep2
   },
   data() {
     return {
-      currentStep: 1,
+      currentStep: 2,
       employeeData: [],
       busData: [],
       companyLocation: {}
