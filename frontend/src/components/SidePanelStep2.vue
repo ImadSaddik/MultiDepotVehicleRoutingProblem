@@ -22,7 +22,6 @@
         <span class="slider-label">1</span>
         <Slider
           v-model="employeeSliderValue"
-          :step="5"
           :min="1"
           :max="maxEmployeeSliderValue"
           :disabled="!employeeToggleSwitchChecked"
@@ -45,7 +44,6 @@
         <span class="slider-label">1</span>
         <Slider
           v-model="busSliderValue"
-          :step="5"
           :min="1"
           :max="maxBusSliderValue"
           :disabled="!busToggleSwitchChecked"
