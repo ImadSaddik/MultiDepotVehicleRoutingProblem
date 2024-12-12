@@ -119,9 +119,11 @@ export default {
       this.busLayer = L.layerGroup().addTo(toRaw(this.map));
       this.companyLayer = L.layerGroup().addTo(toRaw(this.map));
 
-      this.updateEmployeeMarkers();
-      this.updateBusMarkers();
-      this.updateCompanyMarker();
+      if (this.store.sidePanelStep > 1) {
+        this.updateEmployeeMarkers();
+        this.updateBusMarkers();
+        this.updateCompanyMarker();
+      }
     },
     updateEmployeeMarkers() {
       const rawLayer = toRaw(this.employeeLayer);
@@ -154,10 +156,14 @@ export default {
       });
     },
     updateCompanyMarker() {
+      const companyData = toRaw(this.store.companyData);
+      // if (Object.keys(companyData).length === 0) {
+      //   return; 
+      // }
+
       const rawLayer = toRaw(this.companyLayer);
       rawLayer.clearLayers();
 
-      const companyData = this.store.companyData;
       const marker = L.marker([companyData.latitude, companyData.longitude], { icon: toRaw(this.companyIcon) })
         .bindPopup(`
           <strong>Company</strong><br>
