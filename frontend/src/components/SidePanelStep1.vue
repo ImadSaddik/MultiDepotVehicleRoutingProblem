@@ -160,6 +160,8 @@
 </template>
 
 <script>
+import { dataStore } from "@/store/dataStore";
+
 import FileUpload from "primevue/fileupload";
 import InputNumber from "primevue/inputnumber";
 import Divider from "primevue/divider";
@@ -193,6 +195,10 @@ export default {
       isLatitudeInvalid: false,
       isLongitudeInvalid: false,
     };
+  },
+  setup() {
+    const store = dataStore();
+    return { store };
   },
   methods: {
     handleFileUpload(event, dataProperty) {
@@ -260,14 +266,21 @@ export default {
         return;
       }
 
-      this.$emit("next-step", {
+      const data = {
         employeeData: this.employeeData,
         busData: this.busData,
         companyLocation: {
           latitude: this.companyLatitude,
           longitude: this.companyLongitude,
         },
-      });
+      };
+      this.storeDataInStore(data);
+      this.$emit("next-step", data);
+    },
+    storeDataInStore(data) {
+      this.store.setEmployeeData(data["employeeData"]);
+      this.store.setBusData(data["busData"]);
+      this.store.setCompanyData(data["companyLocation"]);
     },
   },
 };
