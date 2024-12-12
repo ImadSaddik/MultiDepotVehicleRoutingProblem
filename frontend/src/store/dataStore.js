@@ -5,6 +5,7 @@ export const dataStore = defineStore("data", {
     employeeData: [],
     busData: [],
     companyData: {},
+    sidePanelStep: 1,
   }),
   actions: {
     setEmployeeData(data) {
