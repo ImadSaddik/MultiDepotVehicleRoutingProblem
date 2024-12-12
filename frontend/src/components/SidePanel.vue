@@ -11,6 +11,7 @@
       @next-step="handleNextStep"
       @previous-step="handlePreviousStep"
       @employee-slider-change="handleEmployeeSliderChange"
+      @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
     />
   </div>
 </template>
@@ -57,7 +58,10 @@ export default {
         employeeData: this.employeeData.slice(0, value),
         busData: this.busData
       });
-    }
+    },
+    handleEmployeeToggleSwitchChange(value) {
+      this.$emit("employee-toggle-switch-change", value);
+    },
   },
 };
 </script>

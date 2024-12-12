@@ -2,9 +2,11 @@
   <LeafletMap 
     :employeeData="employeeData"
     :busData="busData"
+    :showEmployees
   />
   <SidePanel 
     @data-updated="handleUpdatedData"
+    @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
   />
 </template>
 
@@ -22,6 +24,7 @@ export default {
     return {
       employeeData: [],
       busData: [],
+      showEmployees: true,
     };
   },
   methods: {
@@ -29,6 +32,9 @@ export default {
       this.employeeData = employeeData;
       this.busData = busData;
     },
+    handleEmployeeToggleSwitchChange(value) {
+      this.showEmployees = value;
+    }
   }
 };
 </script>

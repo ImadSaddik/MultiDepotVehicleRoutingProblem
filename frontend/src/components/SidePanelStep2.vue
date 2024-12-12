@@ -12,7 +12,7 @@
     <div class="data-slider-container">
       <p>Employee data</p>
       <div class="toggle-switch-container">
-        <ToggleSwitch v-model="employeeToggleSwitchChecked" />
+        <ToggleSwitch v-model="employeeToggleSwitchChecked" @update:modelValue="handleEmployeeToggleSwitchChange" />
         <span v-if="employeeToggleSwitchChecked">
           Displaying {{ employeeSliderValue }} employee records
         </span>
@@ -89,6 +89,9 @@ export default {
       console.log(value);
       this.$emit("employee-slider-change", value);
     },
+    handleEmployeeToggleSwitchChange(value) {
+      this.$emit("employee-toggle-switch-change", value);
+    }
   },
   watch: {},
 };
