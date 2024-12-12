@@ -308,11 +308,6 @@ label {
   right: 1rem;
 }
 
-.custom-divider {
-  width: 60%;
-  margin: 1rem auto;
-}
-
 .data-visualize-icon {
   margin-top: 0.5rem;
 }

@@ -18,4 +18,9 @@ h1 {
   position: relative;
   padding: 1rem;
 }
+
+.step-container .p-divider.custom-divider {
+  width: 60%;
+  margin: 1rem auto;
+}
 </style>

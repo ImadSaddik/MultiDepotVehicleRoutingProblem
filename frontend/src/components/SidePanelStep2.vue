@@ -53,6 +53,8 @@
       </div>
     </div>
 
+    <Divider class="custom-divider" />
+
     <div class="navigation-buttons">
       <Button
         label="Back"
@@ -76,6 +78,7 @@ import { dataStore } from "@/store/dataStore";
 
 import Button from "primevue/button";
 import Slider from "primevue/slider";
+import Divider from "primevue/divider";
 import ToggleSwitch from "primevue/toggleswitch";
 
 export default {
@@ -83,6 +86,7 @@ export default {
   components: {
     Button,
     Slider,
+    Divider,
     ToggleSwitch,
   },
   setup() {
@@ -139,10 +143,6 @@ export default {
 </script>
 
 <style scoped>
-.step-container {
-  padding: 1rem;
-}
-
 .navigation-buttons {
   position: absolute;
   bottom: 1rem;
