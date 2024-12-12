@@ -44,7 +44,7 @@ export default {
       this.companyLocation = data.companyLocation;
       this.currentStep++;
       
-      this.sendSlicedData(this.initialSliderValue);
+      this.sendSlicedData(this.initialSliderValue, this.initialSliderValue);
     },
     handleNextStep() {
       this.currentStep++;
