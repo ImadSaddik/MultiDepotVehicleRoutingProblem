@@ -3,6 +3,34 @@
     <h1>Routing solver</h1>
     <h2>Data visualization</h2>
 
+    <p>
+      This is the second step of the routing solver. Here you can visualize the
+      data you uploaded to verify that it is correct before proceeding to the
+      next step.
+    </p>
+
+    <div class="data-slider-container">
+      <p>Employee data</p>
+      <div class="toggle-switch-container">
+        <ToggleSwitch v-model="employeeToggleSwitchChecked" />
+        <span v-if="employeeToggleSwitchChecked">
+          Displaying {{ employeeSliderValue }} employee records
+        </span>
+        <span v-else> Enable to view employee records </span>
+      </div>
+      <div class="slider-with-labels">
+        <span class="slider-label">1</span>
+        <Slider
+          v-model="employeeSliderValue"
+          :step="5"
+          :min="1"
+          :max="100"
+          :disabled="!employeeToggleSwitchChecked"
+        />
+        <span class="slider-label">100</span>
+      </div>
+    </div>
+
     <div class="navigation-buttons">
       <Button
         label="Back"
@@ -23,15 +51,31 @@
 
 <script>
 import Button from "primevue/button";
+import Slider from "primevue/slider";
+import ToggleSwitch from "primevue/toggleswitch";
 
 export default {
   name: "SidePanelStep2",
   components: {
     Button,
+    Slider,
+    ToggleSwitch,
   },
-  props: {},
+  props: {
+    employeeData: {
+      type: Array,
+      required: true,
+    },
+    busData: {
+      type: Array,
+      required: true,
+    },
+  },
   data() {
-    return {};
+    return {
+      employeeToggleSwitchChecked: true,
+      employeeSliderValue: 5,
+    };
   },
   methods: {
     goToNextStep() {
@@ -58,5 +102,26 @@ export default {
 
 .back-button {
   margin-right: 1rem;
+}
+
+.data-slider-container {
+  margin-top: 2rem;
+}
+
+.toggle-switch-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slider-with-labels {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+:deep(.p-slider) {
+  flex: 1;
 }
 </style>
