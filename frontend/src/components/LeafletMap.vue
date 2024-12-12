@@ -13,6 +13,7 @@ export default {
   props: {
     employeeData: [],
     busData: [],
+    companyData: {},
     showEmployees: true,
     showBuses: true
   },
@@ -46,6 +47,14 @@ export default {
       handler() {
         if (this.map && this.busLayer) {
           this.updateBusMarkers();
+        }
+      },
+      deep: true
+    },
+    companyData: {
+      handler() {
+        if (this.map && this.companyLayer) {
+          this.updateCompanyMarker();
         }
       },
       deep: true
@@ -119,11 +128,9 @@ export default {
       this.busLayer = L.layerGroup().addTo(toRaw(this.map));
       this.companyLayer = L.layerGroup().addTo(toRaw(this.map));
 
-      if (this.store.sidePanelStep > 1) {
-        this.updateEmployeeMarkers();
-        this.updateBusMarkers();
-        this.updateCompanyMarker();
-      }
+      this.updateEmployeeMarkers();
+      this.updateBusMarkers();
+      this.updateCompanyMarker();
     },
     updateEmployeeMarkers() {
       const rawLayer = toRaw(this.employeeLayer);
@@ -157,9 +164,9 @@ export default {
     },
     updateCompanyMarker() {
       const companyData = toRaw(this.store.companyData);
-      // if (Object.keys(companyData).length === 0) {
-      //   return; 
-      // }
+      if (Object.keys(companyData).length === 0) {
+        return; 
+      }
 
       const rawLayer = toRaw(this.companyLayer);
       rawLayer.clearLayers();
@@ -213,8 +220,8 @@ export default {
 }
 
 .company-bg {
-  background: #FFC107;
-  border: 2px solid #FFA000;
+  background: #F44336;
+  border: 2px solid #D32F2F;
 }
 
 .marker-background .material-icons {

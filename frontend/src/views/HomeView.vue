@@ -2,6 +2,7 @@
   <LeafletMap 
     :employeeData="employeeData"
     :busData="busData"
+    :companyData="companyData"
     :showEmployees
     :showBuses
   />
@@ -26,14 +27,16 @@ export default {
     return {
       employeeData: [],
       busData: [],
+      companyData: {},
       showEmployees: true,
       showBuses: true
     };
   },
   methods: {
-    handleSlicedData({ employeeData, busData }) {
+    handleSlicedData({ employeeData, busData, companyData }) {
       this.employeeData = employeeData;
       this.busData = busData;
+      this.companyData = companyData;
     },
     handleEmployeeToggleSwitchChange(value) {
       this.showEmployees = value;
