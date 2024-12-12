@@ -72,6 +72,8 @@
 </template>
 
 <script>
+import { dataStore } from "@/store/dataStore";
+
 import Button from "primevue/button";
 import Slider from "primevue/slider";
 import ToggleSwitch from "primevue/toggleswitch";
@@ -83,23 +85,17 @@ export default {
     Slider,
     ToggleSwitch,
   },
-  props: {
-    employeeData: {
-      type: Array,
-      required: true,
-    },
-    busData: {
-      type: Array,
-      required: true,
-    },
+  setup() {
+    const store = dataStore()
+    return { store }
   },
   computed: {
     maxEmployeeSliderValue() {
-      let employeeDataSize = this.employeeData.length;
+      let employeeDataSize = this.store.employeeData.length;
       return Math.min(employeeDataSize, this.maxValueForSlider);
     },
     maxBusSliderValue() {
-      let busDataSize = this.busData.length;
+      let busDataSize = this.store.busData.length;
       return Math.min(busDataSize, this.maxValueForSlider);
     },
   },

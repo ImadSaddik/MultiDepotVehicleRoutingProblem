@@ -12,8 +12,6 @@
       <SidePanelStep2
         v-show="currentStep === 2"
         key="step2"
-        :employeeData="employeeData"
-        :busData="busData"
         @next-step="handleNextStep"
         @previous-step="handlePreviousStep"
         @employee-slider-change="handleEmployeeSliderChange"
@@ -69,7 +67,7 @@ export default {
       this.sendSlicedData(busValue, employeeValue);
     },
     sendSlicedData(busValue, employeeValue) {
-      this.$emit("data-updated", {
+      this.$emit("sliced-data", {
         employeeData: this.employeeData.slice(0, employeeValue),
         busData: this.busData.slice(0, busValue),
       });

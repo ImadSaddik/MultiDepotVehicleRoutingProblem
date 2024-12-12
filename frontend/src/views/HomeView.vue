@@ -6,7 +6,7 @@
     :showBuses
   />
   <SidePanel 
-    @data-updated="handleUpdatedData"
+    @sliced-data="handleSlicedData"
     @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
     @bus-toggle-switch-change="handleBusToggleSwitchChange"
   />
@@ -31,7 +31,7 @@ export default {
     };
   },
   methods: {
-    handleUpdatedData({ employeeData, busData }) {
+    handleSlicedData({ employeeData, busData }) {
       this.employeeData = employeeData;
       this.busData = busData;
     },
