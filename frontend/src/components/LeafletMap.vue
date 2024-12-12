@@ -6,6 +6,8 @@
 import L from "leaflet";
 import { toRaw } from 'vue';
 
+import { dataStore } from "@/store/dataStore";
+
 export default {
   name: "LeafletMap",
   props: {
@@ -14,6 +16,10 @@ export default {
     showEmployees: true,
     showBuses: true
   },
+  setup() {
+    const store = dataStore()
+    return { store }
+  },
   data() {
     return {
       map: null,
@@ -21,8 +27,10 @@ export default {
       zoomLevel: 14,
       employeeLayer: null,
       busLayer: null,
+      companyLayer: null,
       employeeIcon: null,
       busIcon: null,
+      companyIcon: null
     };
   },
   watch: {
@@ -93,12 +101,27 @@ export default {
         iconAnchor: [12, 24],
         popupAnchor: [0, -24]
       });
+
+      this.companyIcon = L.divIcon({
+        html: `
+          <div class="marker-background company-bg">
+            <span class="material-icons">business</span>
+          </div>
+        `,
+        className: 'company-marker',
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -24]
+      });
     },
     initializeLayers() {
       this.employeeLayer = L.layerGroup().addTo(toRaw(this.map));
       this.busLayer = L.layerGroup().addTo(toRaw(this.map));
+      this.companyLayer = L.layerGroup().addTo(toRaw(this.map));
+
       this.updateEmployeeMarkers();
       this.updateBusMarkers();
+      this.updateCompanyMarker();
     },
     updateEmployeeMarkers() {
       const rawLayer = toRaw(this.employeeLayer);
@@ -129,6 +152,19 @@ export default {
           `);
         rawLayer.addLayer(marker);
       });
+    },
+    updateCompanyMarker() {
+      const rawLayer = toRaw(this.companyLayer);
+      rawLayer.clearLayers();
+
+      const companyData = this.store.companyData;
+      const marker = L.marker([companyData.latitude, companyData.longitude], { icon: toRaw(this.companyIcon) })
+        .bindPopup(`
+          <strong>Company</strong><br>
+          Latitude: ${companyData.latitude.toFixed(6)}<br>
+          Longitude: ${companyData.longitude.toFixed(6)}
+        `);
+      rawLayer.addLayer(marker);
     }
   }
 };
@@ -168,6 +204,11 @@ export default {
 .bus-bg {
   background: #4CAF50;
   border: 2px solid #388E3C;
+}
+
+.company-bg {
+  background: #FFC107;
+  border: 2px solid #FFA000;
 }
 
 .marker-background .material-icons {
