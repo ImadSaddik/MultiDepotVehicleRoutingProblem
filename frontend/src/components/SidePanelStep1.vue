@@ -65,7 +65,7 @@
       <InputNumber
         fluid
         v-model="companyLatitude"
-        placeholder="-5.56°"
+        placeholder="33.56°"
         useGrouping="false"
         inputId="companyLatitude"
         suffix="°"
@@ -83,7 +83,7 @@
       <InputNumber
         fluid
         v-model="companyLongitude"
-        placeholder="33.56°"
+        placeholder="-5.56°"
         useGrouping="false"
         suffix="°"
         :mode="'decimal'"
