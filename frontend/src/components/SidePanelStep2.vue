@@ -24,11 +24,11 @@
           v-model="employeeSliderValue"
           :step="5"
           :min="1"
-          :max="100"
+          :max="maxEmployeeSliderValue"
           :disabled="!employeeToggleSwitchChecked"
           @update:modelValue="handleEmployeeSliderChange"
         />
-        <span class="slider-label">100</span>
+        <span class="slider-label">{{ maxEmployeeSliderValue }}</span>
       </div>
     </div>
 
@@ -47,11 +47,11 @@
           v-model="busSliderValue"
           :step="5"
           :min="1"
-          :max="100"
+          :max="maxBusSliderValue"
           :disabled="!busToggleSwitchChecked"
           @update:modelValue="handleBusSliderChange"
         />
-        <span class="slider-label">100</span>
+        <span class="slider-label">{{ maxBusSliderValue }}</span>
       </div>
     </div>
 
@@ -95,12 +95,23 @@ export default {
       required: true,
     },
   },
+  computed: {
+    maxEmployeeSliderValue() {
+      let employeeDataSize = this.employeeData.length;
+      return Math.min(employeeDataSize, this.maxValueForSlider);
+    },
+    maxBusSliderValue() {
+      let busDataSize = this.busData.length;
+      return Math.min(busDataSize, this.maxValueForSlider);
+    },
+  },
   data() {
     return {
       employeeToggleSwitchChecked: true,
       employeeSliderValue: 5,
       busToggleSwitchChecked: true,
       busSliderValue: 5,
+      maxValueForSlider: 50,
     };
   },
   methods: {
