@@ -26,6 +26,7 @@
           :min="1"
           :max="100"
           :disabled="!employeeToggleSwitchChecked"
+          @update:modelValue="handleEmployeeSliderChange"
         />
         <span class="slider-label">100</span>
       </div>
@@ -83,6 +84,10 @@ export default {
     },
     goToPreviousStep() {
       this.$emit("previous-step");
+    },
+    handleEmployeeSliderChange(value) {
+      console.log(value);
+      this.$emit("employee-slider-change", value);
     },
   },
   watch: {},

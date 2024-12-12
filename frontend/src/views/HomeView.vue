@@ -1,6 +1,11 @@
 <template>
-  <LeafletMap />
-  <SidePanel />
+  <LeafletMap 
+    :employeeData="employeeData"
+    :busData="busData"
+  />
+  <SidePanel 
+    @data-updated="handleUpdatedData"
+  />
 </template>
 
 <script>
@@ -15,8 +20,16 @@ export default {
   },
   data() {
     return {
+      employeeData: [],
+      busData: [],
     };
   },
+  methods: {
+    handleUpdatedData({ employeeData, busData }) {
+      this.employeeData = employeeData;
+      this.busData = busData;
+    },
+  }
 };
 </script>
 

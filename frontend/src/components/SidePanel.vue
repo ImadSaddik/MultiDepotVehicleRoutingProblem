@@ -10,6 +10,7 @@
       :busData="busData"
       @next-step="handleNextStep"
       @previous-step="handlePreviousStep"
+      @employee-slider-change="handleEmployeeSliderChange"
     />
   </div>
 </template>
@@ -30,6 +31,7 @@ export default {
       employeeData: [],
       busData: [],
       companyLocation: {},
+      initialSliderValue: 5,
     };
   },
   methods: {
@@ -38,6 +40,8 @@ export default {
       this.busData = data.busData;
       this.companyLocation = data.companyLocation;
       this.currentStep++;
+      
+      this.sendSlicedData(this.initialSliderValue);
     },
     handleNextStep() {
       this.currentStep++;
@@ -45,6 +49,15 @@ export default {
     handlePreviousStep() {
       this.currentStep--;
     },
+    handleEmployeeSliderChange(value) {
+      this.sendSlicedData(value);
+    },
+    sendSlicedData(value) {
+      this.$emit('data-updated', {
+        employeeData: this.employeeData.slice(0, value),
+        busData: this.busData
+      });
+    }
   },
 };
 </script>
