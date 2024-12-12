@@ -1,20 +1,27 @@
 <template>
   <div class="container">
-    <SidePanelStep1
-      v-show="currentStep === 1"
-      @next-step="handleStep1Complete"
-    />
-    <SidePanelStep2
-      v-show="currentStep === 2"
-      :employeeData="employeeData"
-      :busData="busData"
-      @next-step="handleNextStep"
-      @previous-step="handlePreviousStep"
-      @employee-slider-change="handleEmployeeSliderChange"
-      @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
-      @bus-slider-change="handleBusSliderChange"
-      @bus-toggle-switch-change="handleBusToggleSwitchChange"
-    />
+    <TransitionGroup
+      :name="animationDirection === 'forward' ? 'slide-left' : 'slide-right'" 
+      mode="out-in"
+    >
+      <SidePanelStep1
+        v-show="currentStep === 1"
+        key="step1"
+        @next-step="handleStep1Complete"
+      />
+      <SidePanelStep2
+        v-show="currentStep === 2"
+        key="step2"
+        :employeeData="employeeData"
+        :busData="busData"
+        @next-step="handleNextStep"
+        @previous-step="handlePreviousStep"
+        @employee-slider-change="handleEmployeeSliderChange"
+        @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
+        @bus-slider-change="handleBusSliderChange"
+        @bus-toggle-switch-change="handleBusToggleSwitchChange"
+      />
+    </TransitionGroup>
   </div>
 </template>
 
@@ -35,6 +42,7 @@ export default {
       busData: [],
       companyLocation: {},
       initialSliderValue: 5,
+      animationDirection: 'forward',
     };
   },
   methods: {
@@ -42,21 +50,23 @@ export default {
       this.employeeData = data.employeeData;
       this.busData = data.busData;
       this.companyLocation = data.companyLocation;
-      this.currentStep++;
-      
+
+      this.handleNextStep();
       this.sendSlicedData(this.initialSliderValue, this.initialSliderValue);
     },
     handleNextStep() {
+      this.animationDirection = 'forward';
       this.currentStep++;
     },
     handlePreviousStep() {
+      this.animationDirection = 'backward';
       this.currentStep--;
     },
     handleEmployeeSliderChange({ busValue, employeeValue }) {
       this.sendSlicedData(busValue, employeeValue);
     },
     handleBusSliderChange({ busValue, employeeValue }) {
-      this.sendSlicedData(busValue, employeeValue);      
+      this.sendSlicedData(busValue, employeeValue);
     },
     sendSlicedData(busValue, employeeValue) {
       this.$emit("data-updated", {
@@ -86,5 +96,34 @@ export default {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   overflow-y: auto;
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s ease;
+  position: absolute;
+  width: 100%;
+}
+
+.slide-left-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-left-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
 }
 </style>
