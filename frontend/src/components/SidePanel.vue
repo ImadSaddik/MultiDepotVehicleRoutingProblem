@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { dataStore } from "@/store/dataStore";
+
 import SidePanelStep1 from "./SidePanelStep1.vue";
 import SidePanelStep2 from "./SidePanelStep2.vue";
 
@@ -32,6 +34,10 @@ export default {
   components: {
     SidePanelStep1,
     SidePanelStep2,
+  },
+  setup() {
+    const store = dataStore()
+    return { store }
   },
   data() {
     return {
@@ -55,10 +61,12 @@ export default {
     handleNextStep() {
       this.animationDirection = 'forward';
       this.currentStep++;
+      this.store.sidePanelStep = this.currentStep;
     },
     handlePreviousStep() {
       this.animationDirection = 'backward';
       this.currentStep--;
+      this.store.sidePanelStep = this.currentStep;
     },
     handleEmployeeSliderChange({ busValue, employeeValue }) {
       this.sendSlicedData(busValue, employeeValue);
