@@ -121,11 +121,17 @@ export default {
     goToPreviousStep() {
       this.$emit("previous-step");
     },
-    handleEmployeeSliderChange(value) {
-      this.$emit("employee-slider-change", value);
+    handleEmployeeSliderChange(currentEmployeeSliderValue) {
+      this.$emit("employee-slider-change", {
+        busValue: this.busSliderValue,
+        employeeValue: currentEmployeeSliderValue,
+      });
     },
-    handleBusSliderChange(value) {
-      this.$emit("bus-slider-change", value);
+    handleBusSliderChange(currentBusSliderValue) {
+      this.$emit("bus-slider-change", {
+        busValue: currentBusSliderValue,
+        employeeValue: this.employeeSliderValue,
+      });
     },
     handleEmployeeToggleSwitchChange(value) {
       this.$emit("employee-toggle-switch-change", value);

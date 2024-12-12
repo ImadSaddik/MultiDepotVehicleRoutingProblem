@@ -12,6 +12,8 @@
       @previous-step="handlePreviousStep"
       @employee-slider-change="handleEmployeeSliderChange"
       @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
+      @bus-slider-change="handleBusSliderChange"
+      @bus-toggle-switch-change="handleBusToggleSwitchChange"
     />
   </div>
 </template>
@@ -50,17 +52,23 @@ export default {
     handlePreviousStep() {
       this.currentStep--;
     },
-    handleEmployeeSliderChange(value) {
-      this.sendSlicedData(value);
+    handleEmployeeSliderChange({ busValue, employeeValue }) {
+      this.sendSlicedData(busValue, employeeValue);
     },
-    sendSlicedData(value) {
-      this.$emit('data-updated', {
-        employeeData: this.employeeData.slice(0, value),
-        busData: this.busData
+    handleBusSliderChange({ busValue, employeeValue }) {
+      this.sendSlicedData(busValue, employeeValue);      
+    },
+    sendSlicedData(busValue, employeeValue) {
+      this.$emit("data-updated", {
+        employeeData: this.employeeData.slice(0, employeeValue),
+        busData: this.busData.slice(0, busValue),
       });
     },
     handleEmployeeToggleSwitchChange(value) {
       this.$emit("employee-toggle-switch-change", value);
+    },
+    handleBusToggleSwitchChange(value) {
+      this.$emit("bus-toggle-switch-change", value);
     },
   },
 };

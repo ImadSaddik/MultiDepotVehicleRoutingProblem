@@ -3,10 +3,12 @@
     :employeeData="employeeData"
     :busData="busData"
     :showEmployees
+    :showBuses
   />
   <SidePanel 
     @data-updated="handleUpdatedData"
     @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
+    @bus-toggle-switch-change="handleBusToggleSwitchChange"
   />
 </template>
 
@@ -25,6 +27,7 @@ export default {
       employeeData: [],
       busData: [],
       showEmployees: true,
+      showBuses: true
     };
   },
   methods: {
@@ -34,6 +37,9 @@ export default {
     },
     handleEmployeeToggleSwitchChange(value) {
       this.showEmployees = value;
+    },
+    handleBusToggleSwitchChange(value) {
+      this.showBuses = value;
     }
   }
 };
