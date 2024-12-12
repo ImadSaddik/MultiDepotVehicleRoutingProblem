@@ -17,5 +17,8 @@ export const dataStore = defineStore("data", {
     setCompanyData(data) {
       this.companyData = data;
     },
+    setSidePanelStep(step) {
+      this.sidePanelStep = step;
+    },
   },
 });

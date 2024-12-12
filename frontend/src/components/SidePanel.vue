@@ -61,12 +61,12 @@ export default {
     handleNextStep() {
       this.animationDirection = 'forward';
       this.currentStep++;
-      this.store.sidePanelStep = this.currentStep;
+      this.store.setSidePanelStep(this.currentStep);
     },
     handlePreviousStep() {
       this.animationDirection = 'backward';
       this.currentStep--;
-      this.store.sidePanelStep = this.currentStep;
+      this.store.setSidePanelStep(this.currentStep);
     },
     handleEmployeeSliderChange({ busValue, employeeValue }) {
       this.sendSlicedData(busValue, employeeValue);
