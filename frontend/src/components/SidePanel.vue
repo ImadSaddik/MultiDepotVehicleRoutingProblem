@@ -78,6 +78,7 @@ export default {
       this.$emit("sliced-data", {
         employeeData: this.employeeData.slice(0, employeeValue),
         busData: this.busData.slice(0, busValue),
+        companyData: this.store.companyData,
       });
     },
     handleEmployeeToggleSwitchChange(value) {
