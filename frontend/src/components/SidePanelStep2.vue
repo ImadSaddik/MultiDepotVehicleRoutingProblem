@@ -32,6 +32,29 @@
       </div>
     </div>
 
+    <div class="data-slider-container">
+      <p>Bus data</p>
+      <div class="toggle-switch-container">
+        <ToggleSwitch v-model="busToggleSwitchChecked" @update:modelValue="handleBusToggleSwitchChange" />
+        <span v-if="busToggleSwitchChecked">
+          Displaying {{ busSliderValue }} bus records
+        </span>
+        <span v-else> Enable to view bus records </span>
+      </div>
+      <div class="slider-with-labels">
+        <span class="slider-label">1</span>
+        <Slider
+          v-model="busSliderValue"
+          :step="5"
+          :min="1"
+          :max="100"
+          :disabled="!busToggleSwitchChecked"
+          @update:modelValue="handleBusSliderChange"
+        />
+        <span class="slider-label">100</span>
+      </div>
+    </div>
+
     <div class="navigation-buttons">
       <Button
         label="Back"
@@ -76,6 +99,8 @@ export default {
     return {
       employeeToggleSwitchChecked: true,
       employeeSliderValue: 5,
+      busToggleSwitchChecked: true,
+      busSliderValue: 5,
     };
   },
   methods: {
@@ -86,11 +111,16 @@ export default {
       this.$emit("previous-step");
     },
     handleEmployeeSliderChange(value) {
-      console.log(value);
       this.$emit("employee-slider-change", value);
+    },
+    handleBusSliderChange(value) {
+      this.$emit("bus-slider-change", value);
     },
     handleEmployeeToggleSwitchChange(value) {
       this.$emit("employee-toggle-switch-change", value);
+    },
+    handleBusToggleSwitchChange(value) {
+      this.$emit("bus-toggle-switch-change", value);
     }
   },
   watch: {},
