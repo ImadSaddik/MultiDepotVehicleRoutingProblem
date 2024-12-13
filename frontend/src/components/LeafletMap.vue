@@ -79,10 +79,9 @@ export default {
   },
   methods: {
     initializeMap() {
-      this.map = L.map("map").setView(this.centerCoordinates, this.zoomLevel);
+      this.map = L.map("map", { attributionControl: false }).setView(this.centerCoordinates, this.zoomLevel);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
-        attributionControl: false,
+        attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
       }).addTo(toRaw(this.map));
       L.control.attribution({ position: "bottomleft" }).addTo(toRaw(this.map));
     },
