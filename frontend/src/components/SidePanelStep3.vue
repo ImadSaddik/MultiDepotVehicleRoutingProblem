@@ -55,6 +55,7 @@ import Toast from "primevue/toast";
 import Button from "primevue/button";
 import Select from "primevue/select";
 import Divider from "primevue/divider";
+import axios from "axios";
 
 export default {
   name: "SidePanelStep3",
@@ -87,7 +88,7 @@ export default {
     goToPreviousStep() {
       this.$emit("previous-step");
     },
-    startSolver() {
+    async startSolver() {
       if (!this.selectedSolver) {
         this.isSolverInvalid = true;
         this.$toast.add({
@@ -99,7 +100,37 @@ export default {
         return;
       }
       this.isSolverInvalid = false;
-      console.log("Starting solver with selected solver: ", this.selectedSolver);
+
+      const payload = {
+        solver: this.selectedSolver["value"],
+        employees_data: this.store.employeeData,
+        buses_data: this.store.busData,
+        company_data: this.store.companyData,
+      };
+
+      const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize/`;
+
+      await axios
+        .post(endpointUrl, payload)
+        .then((response) => {
+          // this.store.optimizedData = response.data;
+          // this.isResultAvailable = true;
+          // this.$toast.add({
+          //   severity: "success",
+          //   summary: "Optimization success",
+          //   detail: "The routes have been optimized",
+          //   life: 5000,
+          // });
+          console.log(response.data);
+        })
+        .catch((error) => {
+          this.$toast.add({
+            severity: "error",
+            summary: "Optimization error",
+            detail: error.response.data.message,
+            life: 5000,
+          });
+        });
     }
   },
 };
