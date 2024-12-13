@@ -124,9 +124,9 @@
         :rowsPerPageOptions="[10, 20, 50]"
         tableStyle="min-width: 50rem"
       >
-        <Column field="ID" header="ID"></Column>
-        <Column field="Latitude" header="Latitude"></Column>
-        <Column field="Longitude" header="Longitude"></Column>
+        <Column field="id" header="ID"></Column>
+        <Column field="latitude" header="Latitude"></Column>
+        <Column field="longitude" header="Longitude"></Column>
       </DataTable>
     </Dialog>
 
@@ -151,9 +151,9 @@
         :rowsPerPageOptions="[10, 20, 50]"
         tableStyle="min-width: 50rem"
       >
-        <Column field="ID" header="ID"></Column>
-        <Column field="Latitude" header="Latitude"></Column>
-        <Column field="Longitude" header="Longitude"></Column>
+        <Column field="id" header="ID"></Column>
+        <Column field="latitude" header="Latitude"></Column>
+        <Column field="longitude" header="Longitude"></Column>
       </DataTable>
     </Dialog>
   </div>
@@ -211,9 +211,9 @@ export default {
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
         const normalizedData = jsonData.map((item) => ({
-          ID: item.id,
-          Latitude: item.lat,
-          Longitude: item.lon,
+          id: item.id,
+          latitude: item.lat,
+          longitude: item.lon,
         }));
         this[dataProperty] = normalizedData;
       };

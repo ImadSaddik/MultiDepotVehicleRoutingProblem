@@ -136,12 +136,12 @@ export default {
       rawLayer.clearLayers();
       
       this.employeeData.forEach(employee => {
-        const marker = L.marker([employee.Latitude, employee.Longitude], { icon: toRaw(this.employeeIcon) })
+        const marker = L.marker([employee.latitude, employee.longitude], { icon: toRaw(this.employeeIcon) })
           .bindPopup(`
             <strong>Employee</strong><br>
-            ID: ${employee.ID}<br>
-            Latitude: ${employee.Latitude.toFixed(6)}<br>
-            Longitude: ${employee.Longitude.toFixed(6)}
+            ID: ${employee.id}<br>
+            Latitude: ${employee.latitude.toFixed(6)}<br>
+            Longitude: ${employee.longitude.toFixed(6)}
           `);
         rawLayer.addLayer(marker);
       });
@@ -151,12 +151,12 @@ export default {
       rawLayer.clearLayers();
 
       this.busData.forEach(bus => {
-        const marker = L.marker([bus.Latitude, bus.Longitude], { icon: toRaw(this.busIcon) })
+        const marker = L.marker([bus.latitude, bus.longitude], { icon: toRaw(this.busIcon) })
           .bindPopup(`
             <strong>Bus</strong><br>
-            ID: ${bus.ID}<br>
-            Latitude: ${bus.Latitude.toFixed(6)}<br>
-            Longitude: ${bus.Longitude.toFixed(6)}
+            ID: ${bus.id}<br>
+            Latitude: ${bus.latitude.toFixed(6)}<br>
+            Longitude: ${bus.longitude.toFixed(6)}
           `);
         rawLayer.addLayer(marker);
       });
