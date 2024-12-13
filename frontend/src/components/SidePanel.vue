@@ -19,6 +19,12 @@
         @bus-slider-change="handleBusSliderChange"
         @bus-toggle-switch-change="handleBusToggleSwitchChange"
       />
+      <SidePanelStep3
+        v-show="currentStep === 3"
+        key="step3"
+        @next-step="handleNextStep"
+        @previous-step="handlePreviousStep"
+      />
     </TransitionGroup>
   </div>
 </template>
@@ -28,12 +34,14 @@ import { dataStore } from "@/store/dataStore";
 
 import SidePanelStep1 from "./SidePanelStep1.vue";
 import SidePanelStep2 from "./SidePanelStep2.vue";
+import SidePanelStep3 from "./SidePanelStep3.vue";
 
 export default {
   name: "SidePanel",
   components: {
     SidePanelStep1,
     SidePanelStep2,
+    SidePanelStep3
   },
   setup() {
     const store = dataStore()
