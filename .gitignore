@@ -299,3 +299,5 @@ dist
 .pnp.*
 
 .idea/
+
+*.pkl
