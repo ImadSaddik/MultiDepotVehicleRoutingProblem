@@ -17,6 +17,7 @@
       optionLabel="name"
       placeholder="Select a solver"
       class="custom-selector"
+      :class="{ 'p-invalid': isSolverInvalid }"
     />
 
     <Button
@@ -26,6 +27,8 @@
       @click="startSolver"
     />
 
+    <Toast position="bottom-left" />
+
     <div class="navigation-buttons">
       <Button
         label="Back"
@@ -34,6 +37,7 @@
         @click="goToPreviousStep"
       />
       <Button
+        :disabled="!isResultAvailable"
         label="Next"
         icon="pi pi-arrow-right"
         iconPos="right"
@@ -47,6 +51,7 @@
 <script>
 import { dataStore } from "@/store/dataStore";
 
+import Toast from "primevue/toast";
 import Button from "primevue/button";
 import Select from "primevue/select";
 import Divider from "primevue/divider";
@@ -54,6 +59,7 @@ import Divider from "primevue/divider";
 export default {
   name: "SidePanelStep3",
   components: {
+    Toast,
     Button,
     Select,
     Divider,
@@ -70,6 +76,8 @@ export default {
         { name: "Simulated annealing TSP", value: "simulated_annealing_tsp" },
         { name: "Threshold accepting TSP", value: "threshold_accepting_tsp" },
       ],
+      isResultAvailable: false,
+      isSolverInvalid: false,
     };
   },
   methods: {
@@ -80,6 +88,17 @@ export default {
       this.$emit("previous-step");
     },
     startSolver() {
+      if (!this.selectedSolver) {
+        this.isSolverInvalid = true;
+        this.$toast.add({
+          severity: "error",
+          summary: "Validation error",
+          detail: "Please select a solver",
+          life: 5000,
+        });
+        return;
+      }
+      this.isSolverInvalid = false;
       console.log("Starting solver with selected solver: ", this.selectedSolver);
     }
   },
@@ -108,5 +127,9 @@ export default {
 
 .optimize-button {
   margin-top: 1rem;
+}
+
+.p-invalid {
+  border-color: var(--red-500) !important;
 }
 </style>
