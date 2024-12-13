@@ -13,7 +13,7 @@
   />
   <transition name="slide-panel" mode="out-in">
     <SidePanel
-      v-if="isSidePanelOpen"
+      v-show="isSidePanelOpen"
       @sliced-data="handleSlicedData"
       @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
       @bus-toggle-switch-change="handleBusToggleSwitchChange"
