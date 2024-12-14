@@ -21,6 +21,7 @@
     />
 
     <Button
+      :loading="isSolving"
       label="Optimize"
       iconPos="right"
       class="optimize-button"
@@ -37,7 +38,7 @@
         @click="goToPreviousStep"
       />
       <Button
-        :disabled="!isResultAvailable"
+        :disabled="!isSolving && !isResultAvailable"
         label="Next"
         icon="pi pi-arrow-right"
         iconPos="right"
@@ -77,6 +78,7 @@ export default {
         { name: "Simulated annealing TSP", value: "simulated_annealing_tsp" },
         { name: "Threshold accepting TSP", value: "threshold_accepting_tsp" },
       ],
+      isSolving: false,
       isResultAvailable: false,
       isSolverInvalid: false,
     };
@@ -100,6 +102,7 @@ export default {
         return;
       }
       this.isSolverInvalid = false;
+      this.isSolving = true;
 
       const payload = {
         solver: this.selectedSolver["value"],
@@ -113,14 +116,15 @@ export default {
       await axios
         .post(endpointUrl, payload)
         .then((response) => {
-          // this.store.optimizedData = response.data;
-          // this.isResultAvailable = true;
-          // this.$toast.add({
-          //   severity: "success",
-          //   summary: "Optimization success",
-          //   detail: "The routes have been optimized",
-          //   life: 5000,
-          // });
+          this.store.optimizedData = response.data;
+          console.log(response.data);
+          this.isResultAvailable = true;
+          this.$toast.add({
+            severity: "success",
+            summary: "Optimization success",
+            detail: "The routes have been optimized",
+            life: 5000,
+          });
           console.log(response.data);
         })
         .catch((error) => {
@@ -130,8 +134,11 @@ export default {
             detail: error.response.data.message,
             life: 5000,
           });
+          this.isResultAvailable = false;
         });
-    }
+
+      this.isSolving = false;
+    },
   },
 };
 </script>
