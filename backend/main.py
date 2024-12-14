@@ -1,10 +1,11 @@
 import pickle
 
-from typing import List
-from pydantic import BaseModel
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from optimizer import get_optimized_routes
+from clustering import assign_employees_to_buses
+from models import OptimizeRequest
 
 
 app = FastAPI()
@@ -16,36 +17,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-class EmployeeData(BaseModel):
-    id: int
-    latitude: float
-    longitude: float
-
-
-class BusData(BaseModel):
-    id: int
-    latitude: float
-    longitude: float
-
-
-class CompanyData(BaseModel):
-    latitude: float
-    longitude: float
-
-
-class OptimizeRequest(BaseModel):
-    solver: str
-    employees_data: List[EmployeeData]
-    buses_data: List[BusData]
-    company_data: CompanyData
+with open('./routes.pkl', 'rb') as f:
+    routes = pickle.load(f)
 
 
 @app.post("/api/v1/optimize/")
 async def optimize_route(request: OptimizeRequest):
-    solver_method = request.solver
-    employees_data = request.employees_data
-    buses_data = request.buses_data
-    company_data = request.company_data
+    data = get_data_in_expected_format(
+        request=request
+    )
 
-    return {"status": "ok"}
+    employees_to_bus_clusters = assign_employees_to_buses(
+        buses_data=data["buses_data"],
+        employees_data=data["employees_data"],
+        routes=routes,
+    )
+    optimized_routes = get_optimized_routes(
+        employees_to_bus_clusters=employees_to_bus_clusters,
+        buses_data=data["buses_data"],
+        employees_data=data["employees_data"],
+        company_location=data["company_data"],
+        routes=routes,
+    )
+    return optimized_routes
+
+
+def get_data_in_expected_format(request: OptimizeRequest) -> dict:
+    solver_method = request.solver
+    buses_data = [(bus_data.latitude, bus_data.longitude)
+                  for bus_data in request.buses_data]
+    employees_data = [(employee_data.latitude, employee_data.longitude)
+                      for employee_data in request.employees_data]
+    company_data = (request.company_data.latitude,
+                    request.company_data.longitude)
+    return {
+        "solver_method": solver_method,
+        "buses_data": buses_data,
+        "employees_data": employees_data,
+        "company_data": company_data,
+    }
