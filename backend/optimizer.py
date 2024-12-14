@@ -79,12 +79,16 @@ def _get_route_segments(
             continue
 
         route_info = routes[route_key]
+        coordinates = [
+            Location(latitude=lat, longitude=lon)
+            for lat, lon in route_info['coordinates']
+        ]
         route_segment = RouteSegment(
             source=Location(latitude=start_loc[0], longitude=start_loc[1]),
             destination=Location(latitude=end_loc[0], longitude=end_loc[1]),
             distance=route_info['distance'],
             duration=route_info['duration'],
-            coordinates=route_info['coordinates']
+            coordinates=coordinates
         )
         route_segments.append(route_segment)
 

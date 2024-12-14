@@ -36,7 +36,7 @@ class RouteSegment(BaseModel):
     destination: Location
     distance: float
     duration: float
-    coordinates: List[tuple]
+    coordinates: List[Location]
     
 class OptimizeResponse(BaseModel):
     status: str
