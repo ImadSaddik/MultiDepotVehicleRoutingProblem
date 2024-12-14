@@ -25,6 +25,11 @@
         @next-step="handleNextStep"
         @previous-step="handlePreviousStep"
       />
+      <SidePanelStep4
+        v-show="currentStep === 4"
+        key="step4"
+        @previous-step="handlePreviousStep"
+      />
     </TransitionGroup>
   </div>
 </template>
@@ -35,13 +40,15 @@ import { dataStore } from "@/store/dataStore";
 import SidePanelStep1 from "./SidePanelStep1.vue";
 import SidePanelStep2 from "./SidePanelStep2.vue";
 import SidePanelStep3 from "./SidePanelStep3.vue";
+import SidePanelStep4 from "./SidePanelStep4.vue";
 
 export default {
   name: "SidePanel",
   components: {
     SidePanelStep1,
     SidePanelStep2,
-    SidePanelStep3
+    SidePanelStep3,
+    SidePanelStep4
   },
   setup() {
     const store = dataStore()
