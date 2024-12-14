@@ -3,7 +3,7 @@ from typing import List
 from networkx import DiGraph
 from networkx.algorithms.approximation import traveling_salesman_problem, greedy_tsp
 
-from models import RouteSegment, OptimizeResponse
+from models import RouteSegment, OptimizeResponse, Location
 from graph import get_connected_graph
 
 
@@ -80,8 +80,8 @@ def _get_route_segments(
 
         route_info = routes[route_key]
         route_segment = RouteSegment(
-            source=start_loc,
-            destination=end_loc,
+            source=Location(latitude=start_loc[0], longitude=start_loc[1]),
+            destination=Location(latitude=end_loc[0], longitude=end_loc[1]),
             distance=route_info['distance'],
             duration=route_info['duration'],
             coordinates=route_info['coordinates']

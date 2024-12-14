@@ -26,9 +26,14 @@ class OptimizeRequest(BaseModel):
     company_data: CompanyData
     
     
+class Location(BaseModel):
+    latitude: float
+    longitude: float
+
+
 class RouteSegment(BaseModel):
-    source: tuple
-    destination: tuple
+    source: Location
+    destination: Location
     distance: float
     duration: float
     coordinates: List[tuple]
