@@ -116,28 +116,28 @@ export default {
       await axios
         .post(endpointUrl, payload)
         .then((response) => {
-          this.store.optimizedData = response.data;
-          console.log(response.data);
+          this.store.setOptimizedData(response.data.routes);
           this.isResultAvailable = true;
+          this.isSolving = false;
+
           this.$toast.add({
             severity: "success",
             summary: "Optimization success",
             detail: "The routes have been optimized",
             life: 5000,
           });
-          console.log(response.data);
         })
         .catch((error) => {
+          this.isResultAvailable = false;
+          this.isSolving = false;
+
           this.$toast.add({
             severity: "error",
             summary: "Optimization error",
             detail: error.response.data.message,
             life: 5000,
           });
-          this.isResultAvailable = false;
         });
-
-      this.isSolving = false;
     },
   },
 };

@@ -6,6 +6,7 @@ export const dataStore = defineStore("data", {
     busData: [],
     companyData: {},
     sidePanelStep: 1,
+    optimizedData: [],
   }),
   actions: {
     setEmployeeData(data) {
@@ -19,6 +20,9 @@ export const dataStore = defineStore("data", {
     },
     setSidePanelStep(step) {
       this.sidePanelStep = step;
+    },
+    setOptimizedData(data) {
+      this.optimizedData = data;
     },
   },
 });
