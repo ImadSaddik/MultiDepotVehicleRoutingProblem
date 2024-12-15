@@ -27,6 +27,56 @@
       />
     </div>
 
+    <Divider class="custom-divider" />
+
+    <h2>Route statistics</h2>
+    <div class="statistics-container">
+      <Card class="stat-card">
+        <template #header>
+          <div class="card-header">
+            <i class="pi pi-map-marker" style="font-size: 2rem"></i>
+            <h3>Total distance</h3>
+          </div>
+        </template>
+        <template #content>
+          <div class="stat-content">
+            <div class="stat-number">{{ formatDistance }}</div>
+            <div class="stat-label">kilometers</div>
+          </div>
+        </template>
+      </Card>
+
+      <Card class="stat-card">
+        <template #header>
+          <div class="card-header">
+            <i class="pi pi-clock" style="font-size: 2rem"></i>
+            <h3>Duration</h3>
+          </div>
+        </template>
+        <template #content>
+          <div class="stat-content">
+            <div class="stat-number">{{ formatDuration }}</div>
+            <div class="stat-label">minutes</div>
+          </div>
+        </template>
+      </Card>
+
+      <Card class="stat-card">
+        <template #header>
+          <div class="card-header">
+            <i class="pi pi-users" style="font-size: 2rem"></i>
+            <h3>Passengers</h3>
+          </div>
+        </template>
+        <template #content>
+          <div class="stat-content">
+            <div class="stat-number">{{ passengerCount }}</div>
+            <div class="stat-label">employees</div>
+          </div>
+        </template>
+      </Card>
+    </div>
+
     <Button
       label="Back"
       icon="pi pi-arrow-left"
@@ -38,9 +88,10 @@
 
 <script>
 import { dataStore } from "@/store/dataStore";
-
 import Toast from "primevue/toast";
 import Button from "primevue/button";
+import Card from 'primevue/card';
+import Divider from 'primevue/divider';
 import { toRaw } from "vue";
 
 export default {
@@ -48,6 +99,8 @@ export default {
   components: {
     Toast,
     Button,
+    Card,
+    Divider,
   },
   setup() {
     const store = dataStore();
@@ -62,10 +115,26 @@ export default {
     selectedCluster() {
       this.$emit("cluster-selected", this.getClusterData());
     },
+    "store.sidePanelStep"(val) {
+      if (val === 4) {
+        this.$emit("cluster-selected", this.getClusterData());
+      }
+    },
   },
-  "store.sidePanelStep"(val) {
-    if (val === 4) {
-      this.$emit("cluster-selected", this.getClusterData());
+  computed: {
+    currentClusterData() {
+      return this.store.optimizedData[this.selectedCluster];
+    },
+    formatDistance() {
+      const distanceInMeters = this.currentClusterData?.total_distance || 0;
+      return (distanceInMeters / 1000).toFixed(3);
+    },
+    formatDuration() {
+      const seconds = this.currentClusterData?.total_duration || 0;
+      return Math.round(seconds / 60);
+    },
+    passengerCount() {
+      return this.currentClusterData?.employee_nodes?.length || 0;
     }
   },
   methods: {
@@ -123,5 +192,49 @@ export default {
   position: absolute;
   bottom: 1rem;
   right: 1rem;
+}
+
+.statistics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.card-header i {
+  font-size: 1.2rem !important;
+}
+
+.stat-content {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.stat-label {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+}
+
+:deep(.p-card) {
+  border-radius: 0.5rem;
 }
 </style>
