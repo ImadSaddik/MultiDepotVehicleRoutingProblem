@@ -4,7 +4,7 @@
     <h2>Results visualization</h2>
 
     <p>
-      The results are displayed in the map. You can cycle through each bus route to see the optimized route.
+      The results are displayed in the map. You can cycle through each bus to see the optimized route.
     </p>
 
     <Button
