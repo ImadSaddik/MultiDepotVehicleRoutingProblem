@@ -72,3 +72,11 @@ def make_shortest_path_with_unique_nodes(shortest_path: List[int]) -> List[int]:
             already_assigned.add(node)
 
     return shortest_path_with_unique_nodes
+
+
+def calculate_total_distance(route_segments: List[RouteSegment]) -> float:
+    return sum([route_segment.distance for route_segment in route_segments])
+
+
+def calculate_total_duration(route_segments: List[RouteSegment]) -> float:
+    return sum([route_segment.duration for route_segment in route_segments])
