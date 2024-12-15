@@ -7,7 +7,7 @@ export const dataStore = defineStore("data", {
     companyData: {},
     sidePanelStep: 1,
     optimizedData: [],
-    selectedCluster: null,
+    selectedCluster: 0,
   }),
   actions: {
     setEmployeeData(data) {
