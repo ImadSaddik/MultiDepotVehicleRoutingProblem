@@ -59,7 +59,7 @@ def get_optimized_routes(
             route_segments=route_segments
         ))
 
-    return OptimizeResponse(status="success", routes=optimized_routes)
+    return OptimizeResponse(status="success", data=optimized_routes)
 
 
 def _find_shortest_path(G: Graph) -> List[int]:
