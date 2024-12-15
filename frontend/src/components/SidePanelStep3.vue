@@ -108,7 +108,7 @@ export default {
       await axios
         .post(endpointUrl)
         .then((response) => {
-          this.store.setOptimizedData(response.data.routes);
+          this.store.setOptimizedData(response.data.data);
           this.isResultAvailable = true;
           this.isSolving = false;
 
