@@ -1,11 +1,11 @@
-import pickle
+import psycopg2
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from models import Node
 from optimizer import get_optimized_routes
 from clustering import assign_employees_to_buses
-from models import OptimizeRequest
 
 
 app = FastAPI()
@@ -17,42 +17,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-with open('./routes.pkl', 'rb') as f:
-    routes = pickle.load(f)
+connection = psycopg2.connect(
+    dbname='routes',
+    user='postgres',
+    password='postgres',
+    host='localhost'
+)
+connection.autocommit = True
+cursor = connection.cursor()
 
 
 @app.post("/api/v1/optimize/")
-async def optimize_route(request: OptimizeRequest):
-    data = get_data_in_expected_format(
-        request=request
-    )
+async def optimize_route():
+    bus_nodes, employee_nodes, company_node = _get_nodes()
 
     employees_to_bus_clusters = assign_employees_to_buses(
-        buses_data=data["buses_data"],
-        employees_data=data["employees_data"],
-        routes=routes,
+        bus_nodes=bus_nodes,
+        employee_nodes=employee_nodes,
+        cursor=cursor
     )
     optimized_routes = get_optimized_routes(
         employees_to_bus_clusters=employees_to_bus_clusters,
-        buses_data=data["buses_data"],
-        employees_data=data["employees_data"],
-        company_location=data["company_data"],
-        routes=routes,
+        company_node=company_node,
+        cursor=cursor
     )
     return optimized_routes
 
 
-def get_data_in_expected_format(request: OptimizeRequest) -> dict:
-    solver_method = request.solver
-    buses_data = [(bus_data.latitude, bus_data.longitude)
-                  for bus_data in request.buses_data]
-    employees_data = [(employee_data.latitude, employee_data.longitude)
-                      for employee_data in request.employees_data]
-    company_data = (request.company_data.latitude,
-                    request.company_data.longitude)
-    return {
-        "solver_method": solver_method,
-        "buses_data": buses_data,
-        "employees_data": employees_data,
-        "company_data": company_data,
-    }
+def _get_nodes() -> tuple:
+    cursor.execute("""
+    SELECT * FROM nodes
+    """)
+
+    data = cursor.fetchall()
+    nodes = [Node(id=row[0], latitude=row[1], longitude=row[2], type_=row[3])
+            for row in data]
+    
+    bus_nodes = [node for node in nodes if node.type_ == 'bus']
+    employee_nodes = [node for node in nodes if node.type_ == 'employee']
+    company_node = [node for node in nodes if node.type_ == 'company'][0]
+    
+    return bus_nodes, employee_nodes, company_node
