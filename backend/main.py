@@ -3,7 +3,7 @@ import psycopg2
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import Node
+from models import Node, OptimizeResponse
 from optimizer import get_optimized_routes
 from clustering import assign_employees_to_buses
 
@@ -28,7 +28,7 @@ cursor = connection.cursor()
 
 
 @app.post("/api/v1/optimize/")
-async def optimize_route():
+async def optimize_route() -> OptimizeResponse:
     bus_nodes, employee_nodes, company_node = _get_nodes()
 
     employees_to_bus_clusters = assign_employees_to_buses(

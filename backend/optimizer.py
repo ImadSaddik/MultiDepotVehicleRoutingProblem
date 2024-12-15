@@ -6,11 +6,13 @@ from networkx import Graph
 from networkx.algorithms.approximation import traveling_salesman_problem, greedy_tsp
 
 from graph import get_connected_graph
-from models import RouteSegment, OptimizeResponse, Node
+from models import RouteSegment, OptimizeResponse, Node, ClusterData
 from utils import (
     get_node_by_id,
     get_route_segments,
     get_employees_by_ids,
+    calculate_total_distance,
+    calculate_total_duration,
     make_shortest_path_with_unique_nodes
 )
 
@@ -48,7 +50,14 @@ def get_optimized_routes(
             shortest_path=shortest_path,
             cursor=cursor,
         )
-        optimized_routes.append(route_segments)
+        optimized_routes.append(ClusterData(
+            bus_node=bus_node,
+            employee_nodes=assigned_employee_nodes,
+            company_node=company_node,
+            total_distance=calculate_total_distance(route_segments),
+            total_duration=calculate_total_duration(route_segments),
+            route_segments=route_segments
+        ))
 
     return OptimizeResponse(status="success", routes=optimized_routes)
 
