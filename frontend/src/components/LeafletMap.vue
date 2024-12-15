@@ -98,7 +98,7 @@ export default {
         }
       }
     },
-    "store.selectedCluster" (val) {
+    "store.selectedCluster"(val) {
       if (this.map && this.routeLayer) {
         this.updateRouteLayer();
       }
