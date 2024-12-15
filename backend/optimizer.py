@@ -45,6 +45,7 @@ def get_optimized_routes(
 
         route_segments = _get_route_segments(
             nodes=sub_graph_nodes,
+            shortest_path=shortest_path,
             cursor=cursor,
         )
         optimized_routes.append(route_segments)
