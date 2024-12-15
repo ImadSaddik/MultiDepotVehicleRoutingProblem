@@ -218,7 +218,14 @@ export default {
     },
     centerMapOnLocation(latitude, longitude) {
       if (this.map) {
-        toRaw(this.map).setView([latitude, longitude], this.zoomLevel);
+        toRaw(this.map).flyTo(
+          [latitude, longitude],
+          this.zoomLevel,
+          {
+            duration: 1,
+            easeLinearity: 1,
+          }
+        );
       }
     },
     handleStepChange(step) {
