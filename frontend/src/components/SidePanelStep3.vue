@@ -104,17 +104,9 @@ export default {
       this.isSolverInvalid = false;
       this.isSolving = true;
 
-      const payload = {
-        solver: this.selectedSolver["value"],
-        employees_data: this.store.employeeData,
-        buses_data: this.store.busData,
-        company_data: this.store.companyData,
-      };
-
       const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize/`;
-
       await axios
-        .post(endpointUrl, payload)
+        .post(endpointUrl)
         .then((response) => {
           this.store.setOptimizedData(response.data.routes);
           this.isResultAvailable = true;
