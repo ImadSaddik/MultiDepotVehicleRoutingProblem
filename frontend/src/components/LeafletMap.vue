@@ -217,13 +217,14 @@ export default {
       });
     },
     centerMapOnLocation(latitude, longitude) {
+      const customZoomLevel = 16;
       if (this.map) {
         toRaw(this.map).flyTo(
           [latitude, longitude],
-          this.zoomLevel,
+          customZoomLevel,
           {
             duration: 1,
-            easeLinearity: 1,
+            easeLinearity: 0.25,
           }
         );
       }
