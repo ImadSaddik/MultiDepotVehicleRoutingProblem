@@ -4,7 +4,7 @@
 
 <script>
 import L from "leaflet";
-import { toRaw } from 'vue';
+import { toRaw } from "vue";
 
 import { dataStore } from "@/store/dataStore";
 
@@ -15,11 +15,11 @@ export default {
     busData: [],
     companyData: {},
     showEmployees: true,
-    showBuses: true
+    showBuses: true,
   },
   setup() {
-    const store = dataStore()
-    return { store }
+    const store = dataStore();
+    return { store };
   },
   data() {
     return {
@@ -29,9 +29,10 @@ export default {
       employeeLayer: null,
       busLayer: null,
       companyLayer: null,
+      routeLayer: null,
       employeeIcon: null,
       busIcon: null,
-      companyIcon: null
+      companyIcon: null,
     };
   },
   watch: {
@@ -41,7 +42,7 @@ export default {
           this.updateEmployeeMarkers();
         }
       },
-      deep: true
+      deep: true,
     },
     busData: {
       handler() {
@@ -49,7 +50,7 @@ export default {
           this.updateBusMarkers();
         }
       },
-      deep: true
+      deep: true,
     },
     companyData: {
       handler() {
@@ -57,7 +58,7 @@ export default {
           this.updateCompanyMarker();
         }
       },
-      deep: true
+      deep: true,
     },
     showEmployees(val) {
       if (this.employeeLayer) {
@@ -70,6 +71,37 @@ export default {
         if (val) toRaw(this.busLayer).addTo(toRaw(this.map));
         else toRaw(this.busLayer).remove();
       }
+    },
+    "store.sidePanelStep"(val) {
+      if (val === 2) {
+        if (this.employeeLayer && this.showEmployees)
+          toRaw(this.employeeLayer).addTo(toRaw(this.map));
+        if (this.busLayer && this.showBuses)
+          toRaw(this.busLayer).addTo(toRaw(this.map));
+        if (this.companyLayer) toRaw(this.companyLayer).addTo(toRaw(this.map));
+      } else {
+        if (this.employeeLayer) toRaw(this.employeeLayer).remove();
+        if (this.busLayer) toRaw(this.busLayer).remove();
+        if (this.companyLayer) toRaw(this.companyLayer).remove();
+        if (this.routeLayer) toRaw(this.routeLayer).remove();
+      }
+
+      if (val === 4) {
+        if (this.employeeLayer && this.showEmployees)
+          toRaw(this.employeeLayer).addTo(toRaw(this.map));
+        if (this.busLayer && this.showBuses)
+          toRaw(this.busLayer).addTo(toRaw(this.map));
+        if (this.companyLayer) toRaw(this.companyLayer).addTo(toRaw(this.map));
+        if (this.routeLayer) {
+          this.updateRouteLayer();
+          toRaw(this.routeLayer).addTo(toRaw(this.map));
+        }
+      }
+    },
+    "store.selectedCluster" (val) {
+      if (this.map && this.routeLayer) {
+        this.updateRouteLayer();
+      }
     }
   },
   mounted() {
@@ -79,9 +111,13 @@ export default {
   },
   methods: {
     initializeMap() {
-      this.map = L.map("map", { attributionControl: false }).setView(this.centerCoordinates, this.zoomLevel);
+      this.map = L.map("map", { attributionControl: false }).setView(
+        this.centerCoordinates,
+        this.zoomLevel
+      );
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
+        attribution:
+          "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
       }).addTo(toRaw(this.map));
       L.control.attribution({ position: "bottomleft" }).addTo(toRaw(this.map));
     },
@@ -92,22 +128,22 @@ export default {
             <span class="material-icons">person</span>
           </div>
         `,
-        className: 'employee-marker',
+        className: "employee-marker",
         iconSize: [24, 24],
         iconAnchor: [12, 24],
-        popupAnchor: [0, -24]
+        popupAnchor: [0, -24],
       });
-      
+
       this.busIcon = L.divIcon({
         html: `
           <div class="marker-background bus-bg">
             <span class="material-icons">directions_bus</span>
           </div>
         `,
-        className: 'bus-marker',
+        className: "bus-marker",
         iconSize: [24, 24],
         iconAnchor: [12, 24],
-        popupAnchor: [0, -24]
+        popupAnchor: [0, -24],
       });
 
       this.companyIcon = L.divIcon({
@@ -116,28 +152,26 @@ export default {
             <span class="material-icons">business</span>
           </div>
         `,
-        className: 'company-marker',
+        className: "company-marker",
         iconSize: [24, 24],
         iconAnchor: [12, 24],
-        popupAnchor: [0, -24]
+        popupAnchor: [0, -24],
       });
     },
     initializeLayers() {
       this.employeeLayer = L.layerGroup().addTo(toRaw(this.map));
       this.busLayer = L.layerGroup().addTo(toRaw(this.map));
       this.companyLayer = L.layerGroup().addTo(toRaw(this.map));
-
-      this.updateEmployeeMarkers();
-      this.updateBusMarkers();
-      this.updateCompanyMarker();
+      this.routeLayer = L.layerGroup().addTo(toRaw(this.map));
     },
     updateEmployeeMarkers() {
       const rawLayer = toRaw(this.employeeLayer);
       rawLayer.clearLayers();
-      
-      this.employeeData.forEach(employee => {
-        const marker = L.marker([employee.latitude, employee.longitude], { icon: toRaw(this.employeeIcon) })
-          .bindPopup(`
+
+      this.employeeData.forEach((employee) => {
+        const marker = L.marker([employee.latitude, employee.longitude], {
+          icon: toRaw(this.employeeIcon),
+        }).bindPopup(`
             <strong>Employee</strong><br>
             ID: ${employee.id}<br>
             Latitude: ${employee.latitude.toFixed(6)}<br>
@@ -150,9 +184,10 @@ export default {
       const rawLayer = toRaw(this.busLayer);
       rawLayer.clearLayers();
 
-      this.busData.forEach(bus => {
-        const marker = L.marker([bus.latitude, bus.longitude], { icon: toRaw(this.busIcon) })
-          .bindPopup(`
+      this.busData.forEach((bus) => {
+        const marker = L.marker([bus.latitude, bus.longitude], {
+          icon: toRaw(this.busIcon),
+        }).bindPopup(`
             <strong>Bus</strong><br>
             ID: ${bus.id}<br>
             Latitude: ${bus.latitude.toFixed(6)}<br>
@@ -164,21 +199,44 @@ export default {
     updateCompanyMarker() {
       const companyData = toRaw(this.store.companyData);
       if (Object.keys(companyData).length === 0) {
-        return; 
+        return;
       }
 
       const rawLayer = toRaw(this.companyLayer);
       rawLayer.clearLayers();
 
-      const marker = L.marker([companyData.latitude, companyData.longitude], { icon: toRaw(this.companyIcon) })
-        .bindPopup(`
+      const marker = L.marker([companyData.latitude, companyData.longitude], {
+        icon: toRaw(this.companyIcon),
+      }).bindPopup(`
           <strong>Company</strong><br>
           Latitude: ${companyData.latitude.toFixed(6)}<br>
           Longitude: ${companyData.longitude.toFixed(6)}
         `);
       rawLayer.addLayer(marker);
-    }
-  }
+    },
+    updateRouteLayer() {
+      const rawLayer = toRaw(this.routeLayer);
+      rawLayer.clearLayers();
+
+      const clusterData = toRaw(this.store.optimizedData[this.store.selectedCluster]);
+      const routeSegments = clusterData["route_segments"];
+
+      routeSegments.forEach(segment => {
+        const segmentCoordinates = segment.coordinates.map(location => [
+          location.latitude,
+          location.longitude,
+        ]);
+
+        const route = L.polyline(segmentCoordinates, {
+          color: "blue",
+          weight: 3,
+          opacity: 0.5,
+          smoothFactor: 1,
+        });
+        rawLayer.addLayer(route);
+      });
+    },
+  },
 };
 </script>
 
@@ -191,9 +249,10 @@ export default {
   position: absolute;
 }
 
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 
-.employee-marker, .bus-marker {
+.employee-marker,
+.bus-marker {
   display: block;
   background: none;
 }
@@ -209,24 +268,24 @@ export default {
 }
 
 .employee-bg {
-  background: #2196F3;
-  border: 2px solid #1976D2;
+  background: #2196f3;
+  border: 2px solid #1976d2;
 }
 
 .bus-bg {
-  background: #4CAF50;
-  border: 2px solid #388E3C;
+  background: #4caf50;
+  border: 2px solid #388e3c;
 }
 
 .company-bg {
-  background: #F44336;
-  border: 2px solid #D32F2F;
+  background: #f44336;
+  border: 2px solid #d32f2f;
 }
 
 .marker-background .material-icons {
   transform: rotate(45deg);
   color: white;
   font-size: 0.75rem;
-  filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
 }
 </style>
