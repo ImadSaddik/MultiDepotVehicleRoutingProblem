@@ -25,8 +25,8 @@ def get_route_segments(
     return RouteSegment(
         source_node_id=row[0],
         destination_node_id=row[1],
-        distance=row[2],
-        duration=row[3],
+        duration=row[2],
+        distance=row[3],
         coordinates=[
             Point(
                 latitude=latitudeLongitude[0],
