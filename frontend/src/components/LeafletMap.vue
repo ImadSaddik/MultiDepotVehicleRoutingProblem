@@ -72,37 +72,12 @@ export default {
         else toRaw(this.busLayer).remove();
       }
     },
-    "store.sidePanelStep"(val) {
-      if (val === 2) {
-        if (this.employeeLayer && this.showEmployees)
-          toRaw(this.employeeLayer).addTo(toRaw(this.map));
-        if (this.busLayer && this.showBuses)
-          toRaw(this.busLayer).addTo(toRaw(this.map));
-        if (this.companyLayer) toRaw(this.companyLayer).addTo(toRaw(this.map));
-      } else {
-        if (this.employeeLayer) toRaw(this.employeeLayer).remove();
-        if (this.busLayer) toRaw(this.busLayer).remove();
-        if (this.companyLayer) toRaw(this.companyLayer).remove();
-        if (this.routeLayer) toRaw(this.routeLayer).remove();
-      }
-
-      if (val === 4) {
-        if (this.employeeLayer && this.showEmployees)
-          toRaw(this.employeeLayer).addTo(toRaw(this.map));
-        if (this.busLayer && this.showBuses)
-          toRaw(this.busLayer).addTo(toRaw(this.map));
-        if (this.companyLayer) toRaw(this.companyLayer).addTo(toRaw(this.map));
-        if (this.routeLayer) {
-          this.updateRouteLayer();
-          toRaw(this.routeLayer).addTo(toRaw(this.map));
-        }
-      }
+    "store.sidePanelStep"(step) {
+      this.handleStepChange(step);
     },
-    "store.selectedCluster"(val) {
-      if (this.map && this.routeLayer) {
-        this.updateRouteLayer();
-      }
-    }
+    "store.selectedCluster"() {
+      this.updateRouteIfVisible();
+    },
   },
   mounted() {
     this.initializeMap();
@@ -218,11 +193,16 @@ export default {
       const rawLayer = toRaw(this.routeLayer);
       rawLayer.clearLayers();
 
-      const clusterData = toRaw(this.store.optimizedData[this.store.selectedCluster]);
+      const clusterData = toRaw(
+        this.store.optimizedData[this.store.selectedCluster]
+      );
       const routeSegments = clusterData["route_segments"];
+      const busNode = clusterData["bus_node"];
 
-      routeSegments.forEach(segment => {
-        const segmentCoordinates = segment.coordinates.map(location => [
+      this.centerMapOnLocation(busNode.latitude, busNode.longitude);
+
+      routeSegments.forEach((segment) => {
+        const segmentCoordinates = segment.coordinates.map((location) => [
           location.latitude,
           location.longitude,
         ]);
@@ -235,6 +215,56 @@ export default {
         });
         rawLayer.addLayer(route);
       });
+    },
+    centerMapOnLocation(latitude, longitude) {
+      if (this.map) {
+        toRaw(this.map).setView([latitude, longitude], this.zoomLevel);
+      }
+    },
+    handleStepChange(step) {
+      this.hideAllLayers();
+
+      switch (step) {
+        case 2:
+          this.showDataLayers();
+          break;
+        case 4:
+          this.showOptimizationResults();
+          break;
+      }
+    },
+    hideAllLayers() {
+      const rawMap = toRaw(this.map);
+      [
+        this.employeeLayer,
+        this.busLayer,
+        this.companyLayer,
+        this.routeLayer,
+      ].forEach((layer) => layer && toRaw(layer).remove(rawMap));
+    },
+    showDataLayers() {
+      const rawMap = toRaw(this.map);
+      if (this.employeeLayer && this.showEmployees) {
+        toRaw(this.employeeLayer).addTo(rawMap);
+      }
+      if (this.busLayer && this.showBuses) {
+        toRaw(this.busLayer).addTo(rawMap);
+      }
+      if (this.companyLayer) {
+        toRaw(this.companyLayer).addTo(rawMap);
+      }
+    },
+    showOptimizationResults() {
+      this.showDataLayers();
+      if (this.routeLayer) {
+        this.updateRouteLayer();
+        toRaw(this.routeLayer).addTo(toRaw(this.map));
+      }
+    },
+    updateRouteIfVisible() {
+      if (this.map && this.routeLayer && this.store.sidePanelStep === 4) {
+        this.updateRouteLayer();
+      }
     },
   },
 };
