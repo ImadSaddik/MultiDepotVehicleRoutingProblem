@@ -1,95 +1,112 @@
 from tqdm import tqdm
-from typing import List
-from networkx import DiGraph
+from typing import List, Tuple
+from psycopg2.extensions import cursor
+
+from networkx import Graph
 from networkx.algorithms.approximation import traveling_salesman_problem, greedy_tsp
 
-from models import RouteSegment, OptimizeResponse, Location
 from graph import get_connected_graph
+from models import RouteSegment, OptimizeResponse, Node
+from utils import (
+    get_node_by_id,
+    get_route_segments,
+    get_employees_by_ids,
+    make_shortest_path_with_unique_nodes
+)
 
 
 def get_optimized_routes(
     employees_to_bus_clusters: dict,
-    buses_data: List[tuple],
-    employees_data: List[tuple],
-    company_location: tuple,
-    routes: dict,
+    company_node: Node,
+    cursor: cursor,
 ) -> OptimizeResponse:
     optimized_routes = []
 
-    for bus_idx, employee_indices in tqdm(
+    for bus_id, employee_indices in tqdm(
         employees_to_bus_clusters.items(),
         total=len(employees_to_bus_clusters)
     ):
         if not employee_indices:
             continue
 
-        bus_location = buses_data[bus_idx]
-        assigned_employees = [employees_data[i] for i in employee_indices]
-        G = get_connected_graph(bus_location, assigned_employees, company_location, routes)
+        bus_node = get_node_by_id(id_=bus_id, cursor=cursor)
+        if not bus_node:
+            continue
+
+        assigned_employee_nodes = get_employees_by_ids(
+            employee_indices, cursor=cursor)
+        if not assigned_employee_nodes:
+            continue
+
+        sub_graph_nodes = [bus_node] + assigned_employee_nodes + [company_node]
+        G = get_connected_graph(nodes=sub_graph_nodes, cursor=cursor)
         shortest_path = _find_shortest_path(G)
+        shortest_path = make_shortest_path_with_unique_nodes(shortest_path)
 
         route_segments = _get_route_segments(
-            shortest_path,
-            bus_location,
-            assigned_employees,
-            company_location,
-            routes
+            nodes=sub_graph_nodes,
+            cursor=cursor,
         )
         optimized_routes.append(route_segments)
 
     return OptimizeResponse(status="success", routes=optimized_routes)
 
 
-def _find_shortest_path(G: DiGraph) -> List:
-    nodes = list(G.nodes)
-    start_node = nodes[0]  # Source (bus location)
-    end_node = nodes[-1]   # Sink (company location)
+def _find_shortest_path(G: Graph) -> List[int]:
+    node_indices = list(G.nodes)
+    start_node_index = node_indices[0]  # Source (Bus node index)
+    end_node_index = node_indices[-1]   # Sink (Company node index)
 
-    # Solve TSP for the intermediate nodes
-    intermediate_nodes = nodes[1:-1]  # Employee nodes
+    intermediate_node_indices = node_indices[:-1]  # Bus node + Employee nodes
     tsp_path = traveling_salesman_problem(
-        G.subgraph(intermediate_nodes),
+        G.subgraph(intermediate_node_indices),
         cycle=False,
         method=greedy_tsp
     )
 
-    # Include start and end
-    full_path = [start_node] + tsp_path + [end_node]
+    # Rearrange the path to ensure it starts at the bus node
+    if tsp_path[0] != start_node_index:
+        bus_index = tsp_path.index(start_node_index)
+        tsp_path = tsp_path[bus_index:] + tsp_path[:bus_index]
 
-    return full_path
+    return tsp_path + [end_node_index]
 
 
 def _get_route_segments(
-    shortest_path: List,
-    bus_location: tuple,
-    employee_locations: List[tuple],
-    company_location: tuple,
-    routes: dict
+    nodes: List[Node],
+    shortest_path: List[int],
+    cursor: cursor
 ) -> List[RouteSegment]:
     route_segments = []
-    locations = [bus_location] + employee_locations + [company_location]
-
     for i in range(len(shortest_path) - 1):
-        start_idx, end_idx = shortest_path[i], shortest_path[i + 1]
-        start_loc = locations[start_idx]
-        end_loc = locations[end_idx]
-
-        route_key = tuple(sorted((tuple(start_loc), tuple(end_loc))))
-        if route_key not in routes:
+        start_node_id, end_node_id = _get_start_end_node_ids(
+            nodes=nodes,
+            shortest_path=shortest_path[i:i+2]
+        )
+        route_segment = get_route_segments(
+            source_node_id=start_node_id,
+            destination_node_id=end_node_id,
+            cursor=cursor
+        )
+        if not route_segment:
             continue
 
-        route_info = routes[route_key]
-        coordinates = [
-            Location(latitude=lat, longitude=lon)
-            for lat, lon in route_info['coordinates']
-        ]
-        route_segment = RouteSegment(
-            source=Location(latitude=start_loc[0], longitude=start_loc[1]),
-            destination=Location(latitude=end_loc[0], longitude=end_loc[1]),
-            distance=route_info['distance'],
-            duration=route_info['duration'],
-            coordinates=coordinates
-        )
         route_segments.append(route_segment)
 
     return route_segments
+
+
+def _get_start_end_node_ids(
+    nodes: List[Node],
+    shortest_path: List[int]
+) -> Tuple[int, int]:
+    start_node_index = shortest_path[0]
+    end_node_index = shortest_path[-1]
+
+    start_node = nodes[start_node_index]
+    end_node = nodes[end_node_index]
+
+    start_node_id = start_node.id
+    end_node_id = end_node.id
+
+    return start_node_id, end_node_id
