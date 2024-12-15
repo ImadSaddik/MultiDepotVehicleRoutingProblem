@@ -17,7 +17,7 @@
         @click="showPreviousCluster" 
       />
 
-      <p>Bus N° {{ selectedCluster }}</p>
+      <p>Bus N° {{ selectedCluster + 1 }}</p>
 
       <Button 
         :disabled="selectedCluster === store.optimizedData.length - 1"
@@ -41,6 +41,7 @@ import { dataStore } from "@/store/dataStore";
 
 import Toast from "primevue/toast";
 import Button from "primevue/button";
+import { toRaw } from "vue";
 
 export default {
   name: "SidePanelStep4",
@@ -56,6 +57,16 @@ export default {
     return {
       selectedCluster: 0,
     };
+  },
+  watch: {
+    selectedCluster() {
+      this.$emit("cluster-selected", this.getClusterData());
+    },
+  },
+  "store.sidePanelStep"(val) {
+    if (val === 4) {
+      this.$emit("cluster-selected", this.getClusterData());
+    }
   },
   methods: {
     goToPreviousStep() {
@@ -73,6 +84,7 @@ export default {
       }
 
       this.selectedCluster = this.selectedCluster + 1;
+      this.store.setSelectedCluster(this.selectedCluster);
     },
     showPreviousCluster() {
       if (this.selectedCluster === 0) {
@@ -86,6 +98,15 @@ export default {
       }
 
       this.selectedCluster = this.selectedCluster - 1;
+      this.store.setSelectedCluster(this.selectedCluster);
+    },
+    getClusterData() {
+      const clusterData = toRaw(this.store.optimizedData[this.selectedCluster]);
+      return {
+        busData: [clusterData["bus_node"]],
+        employeeData: clusterData["employee_nodes"],
+        companyData: clusterData["company_node"],
+      };
     },
   },
 };

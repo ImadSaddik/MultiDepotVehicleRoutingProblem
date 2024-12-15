@@ -17,6 +17,7 @@
       @sliced-data="handleSlicedData"
       @employee-toggle-switch-change="handleEmployeeToggleSwitchChange"
       @bus-toggle-switch-change="handleBusToggleSwitchChange"
+      @cluster-selected="handleClusterData"
     />
   </transition>
 </template>
@@ -44,7 +45,13 @@ export default {
     };
   },
   methods: {
-    handleSlicedData({ employeeData, busData, companyData }) {
+    handleSlicedData(data) {
+      this.updateData(data);
+    },
+    handleClusterData(data) {
+      this.updateData(data);
+    },
+    updateData({ employeeData, busData, companyData }) {
       this.employeeData = employeeData;
       this.busData = busData;
       this.companyData = companyData;

@@ -29,6 +29,7 @@
         v-show="currentStep === 4"
         key="step4"
         @previous-step="handlePreviousStep"
+        @cluster-selected="sendClusterData"
       />
     </TransitionGroup>
   </div>
@@ -95,6 +96,9 @@ export default {
         busData: this.busData.slice(0, busValue),
         companyData: this.store.companyData,
       });
+    },
+    sendClusterData(data) {
+      this.$emit("cluster-selected", data);
     },
     handleEmployeeToggleSwitchChange(value) {
       this.$emit("employee-toggle-switch-change", value);
