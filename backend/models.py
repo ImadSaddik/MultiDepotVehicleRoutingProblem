@@ -22,6 +22,15 @@ class RouteSegment(BaseModel):
     coordinates: List[Point]
 
 
+class ClusterData(BaseModel):
+    bus_node: Node
+    employee_nodes: List[Node]
+    company_node: Node
+    total_distance: float
+    total_duration: float
+    route_segments: List[RouteSegment]
+
+
 class OptimizeResponse(BaseModel):
     status: str
-    routes: List[List[RouteSegment]]
+    data: List[ClusterData]
