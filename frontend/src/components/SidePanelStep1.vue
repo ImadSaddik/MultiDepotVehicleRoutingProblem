@@ -186,8 +186,8 @@ export default {
   },
   data() {
     return {
-      companyLatitude: null,
-      companyLongitude: null,
+      companyLatitude: 35.66521820595065,
+      companyLongitude: -5.66239083177731,
       employeeData: [],
       busData: [],
       showEmployeeDialog: false,
