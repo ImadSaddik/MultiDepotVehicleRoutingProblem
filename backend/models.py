@@ -2,42 +2,26 @@ from typing import List
 from pydantic import BaseModel
 
 
-class EmployeeData(BaseModel):
+class Node(BaseModel):
     id: int
     latitude: float
     longitude: float
+    type_: str
 
 
-class BusData(BaseModel):
-    id: int
-    latitude: float
-    longitude: float
-
-
-class CompanyData(BaseModel):
-    latitude: float
-    longitude: float
-
-
-class OptimizeRequest(BaseModel):
-    solver: str
-    employees_data: List[EmployeeData]
-    buses_data: List[BusData]
-    company_data: CompanyData
-    
-    
-class Location(BaseModel):
+class Point(BaseModel):
     latitude: float
     longitude: float
 
 
 class RouteSegment(BaseModel):
-    source: Location
-    destination: Location
+    source_node_id: int
+    destination_node_id: int
     distance: float
     duration: float
-    coordinates: List[Location]
-    
+    coordinates: List[Point]
+
+
 class OptimizeResponse(BaseModel):
     status: str
     routes: List[List[RouteSegment]]
