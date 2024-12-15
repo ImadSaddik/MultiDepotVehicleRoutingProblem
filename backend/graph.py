@@ -1,28 +1,34 @@
 import networkx as nx
 
-from typing import List
 from networkx import DiGraph
+from typing import List
+from psycopg2.extensions import cursor
+
+from models import Node
+from utils import get_route_segments
 
 def get_connected_graph(
-    bus_location: tuple,
-    employee_locations: List[tuple],
-    company_location: tuple,
-    routes: List[dict]
+    nodes: List[Node],
+    cursor: cursor
 ) -> DiGraph:
-    locations = [bus_location] + employee_locations + [company_location]
-    G = nx.DiGraph()
+    G = nx.Graph()
 
-    for i, loc1 in enumerate(locations):
-        for j, loc2 in enumerate(locations):
+    for i, source_node in enumerate(nodes):
+        for j, destination_node in enumerate(nodes):
             if i == j:  # No self-loops
                 continue
 
-            key = tuple(sorted((tuple(loc1), tuple(loc2))))
-            if key not in routes:
+            source_node_id = source_node.id
+            destination_node_id = destination_node.id
+            route_segment = get_route_segments(
+                source_node_id=source_node_id,
+                destination_node_id=destination_node_id,
+                cursor=cursor
+            )
+            if not route_segment:
                 continue
-
-            route = routes[key]
-            distance = route['distance']
+            
+            distance = route_segment.distance
             G.add_edge(i, j, weight=distance)
 
     return G
