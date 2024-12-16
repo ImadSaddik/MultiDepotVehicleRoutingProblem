@@ -33,6 +33,7 @@ export default {
       employeeIcon: null,
       busIcon: null,
       companyIcon: null,
+      arrowMarker: null,
     };
   },
   watch: {
@@ -90,6 +91,15 @@ export default {
         this.centerCoordinates,
         this.zoomLevel
       );
+      
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14">
+          <path d="M 0,7 L 12,0 L 12,14 Z" fill="blue" opacity="0.7"/>
+        </svg>
+      `;
+      
+      this.arrowMarker = encodeURI("data:image/svg+xml;base64," + btoa(svg));
+      
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
@@ -207,14 +217,55 @@ export default {
           location.longitude,
         ]);
 
+        // Create the main route polyline
         const route = L.polyline(segmentCoordinates, {
           color: "blue",
           weight: 3,
           opacity: 0.5,
           smoothFactor: 1,
         });
+        
+        // Get all points of the route
+        const points = route.getLatLngs();
+        
+        // We want 3 arrows per segment
+        const numArrows = 3;
+        const step = (points.length - 1) / (numArrows + 1);
+        
+        // Place arrows at calculated positions
+        for (let i = 1; i <= numArrows; i++) {
+          const index = Math.floor(step * i);
+          const prevIndex = Math.floor(index - 1);
+          
+          if (prevIndex >= 0 && index < points.length) {
+            const rotationAngle = this.getRotationAngle(points[index], points[prevIndex]);
+            
+            const midPoint = L.latLng(
+              (points[prevIndex].lat + points[index].lat) / 2,
+              (points[prevIndex].lng + points[index].lng) / 2
+            );
+            
+            const arrowIcon = L.divIcon({
+              html: `<div style="
+                width: 14px;
+                height: 14px;
+                background-image: url(${this.arrowMarker});
+                transform: rotate(${rotationAngle}deg);
+              "></div>`,
+              className: 'arrow-marker',
+              iconSize: [14, 14],
+              iconAnchor: [7, 7],
+            });
+            
+            L.marker(midPoint, { icon: arrowIcon }).addTo(rawLayer);
+          }
+        }
+
         rawLayer.addLayer(route);
       });
+    },
+    getRotationAngle(p1, p2) {
+      return (Math.atan2(p2.lng - p1.lng, p2.lat - p1.lat) * 180 / Math.PI) - 90;
     },
     centerMapOnLocation(latitude, longitude) {
       const customZoomLevel = 16;
@@ -223,7 +274,7 @@ export default {
           [latitude, longitude],
           customZoomLevel,
           {
-            duration: 1,
+            duration: 1, // Duration in seconds
             easeLinearity: 0.25,
           }
         );
@@ -325,5 +376,10 @@ export default {
   color: white;
   font-size: 0.75rem;
   filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.arrow-marker {
+  background: none;
+  border: none;
 }
 </style>
