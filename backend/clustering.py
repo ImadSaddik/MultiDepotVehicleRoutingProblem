@@ -43,4 +43,5 @@ def assign_employees_to_buses(
         assigned = set(assignments[bus_node_id])
         unassigned_employees -= assigned
 
-    return assignments
+    non_empty_assignments = {bus_id: employee_ids for bus_id, employee_ids in assignments.items() if employee_ids}
+    return non_empty_assignments
