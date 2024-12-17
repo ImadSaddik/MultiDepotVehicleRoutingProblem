@@ -86,7 +86,6 @@ export default {
     routeDisplay: {
       handler(newValue) {
         if (newValue) {
-          this.store.setRouteDisplayMode(newValue);
           this.updateRouteIfVisible();
         }
       },
