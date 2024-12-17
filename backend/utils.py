@@ -13,9 +13,8 @@ def get_route_segments(
 ) -> Optional[RouteSegment]:
     cursor.execute("""
     SELECT * FROM route_mapping 
-    WHERE (source_node_id = %s AND destination_node_id = %s)
-    OR (source_node_id = %s AND destination_node_id = %s)
-    """, (source_node_id, destination_node_id, destination_node_id, source_node_id))
+    WHERE source_node_id = %s AND destination_node_id = %s
+    """, (source_node_id, destination_node_id))
 
     data = cursor.fetchall()
     if not data:
