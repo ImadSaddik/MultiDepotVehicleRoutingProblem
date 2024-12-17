@@ -11,7 +11,7 @@ def get_connected_graph(
     nodes: List[Node],
     cursor: cursor
 ) -> DiGraph:
-    G = nx.Graph()
+    G = nx.DiGraph()
 
     for i, source_node in enumerate(nodes):
         for j, destination_node in enumerate(nodes):

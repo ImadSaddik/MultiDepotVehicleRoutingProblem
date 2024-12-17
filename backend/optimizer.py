@@ -2,7 +2,7 @@ from tqdm import tqdm
 from typing import List, Tuple
 from psycopg2.extensions import cursor
 
-from networkx import Graph
+from networkx import DiGraph
 from networkx.algorithms.approximation import traveling_salesman_problem, greedy_tsp
 
 from graph import get_connected_graph
@@ -62,7 +62,7 @@ def get_optimized_routes(
     return OptimizeResponse(status="success", data=optimized_routes)
 
 
-def _find_shortest_path(G: Graph) -> List[int]:
+def _find_shortest_path(G: DiGraph) -> List[int]:
     node_indices = list(G.nodes)
     start_node_index = node_indices[0]  # Source (Bus node index)
     end_node_index = node_indices[-1]   # Sink (Company node index)
