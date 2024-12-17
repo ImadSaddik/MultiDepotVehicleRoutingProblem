@@ -91,15 +91,15 @@ export default {
         this.centerCoordinates,
         this.zoomLevel
       );
-      
+
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14">
           <path d="M 0,7 L 12,0 L 12,14 Z" fill="blue" opacity="0.7"/>
         </svg>
       `;
-      
+
       this.arrowMarker = encodeURI("data:image/svg+xml;base64," + btoa(svg));
-      
+
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
@@ -211,73 +211,138 @@ export default {
 
       this.centerMapOnLocation(busNode.latitude, busNode.longitude);
 
-      routeSegments.forEach((segment) => {
-        const segmentCoordinates = segment.coordinates.map((location) => [
+      const firstSegment = routeSegments[0];
+      if (firstSegment) {
+        const segmentCoordinates = firstSegment.coordinates.map((location) => [
           location.latitude,
           location.longitude,
         ]);
 
-        // Create the main route polyline
-        const route = L.polyline(segmentCoordinates, {
-          color: "blue",
-          weight: 3,
-          opacity: 0.5,
-          smoothFactor: 1,
+        const segmentRoutePolyLineBorder = L.polyline(segmentCoordinates, {
+          color: "#000000",
+          weight: 9,
+          opacity: 1,
+          smoothFactor: 1.25,
         });
-        
-        // Get all points of the route
-        const points = route.getLatLngs();
-        
-        // We want 3 arrows per segment
-        const numArrows = 3;
-        const step = (points.length - 1) / (numArrows + 1);
-        
-        // Place arrows at calculated positions
-        for (let i = 1; i <= numArrows; i++) {
+
+        const segmentRoutePolyLine = L.polyline(segmentCoordinates, {
+          weight: 7,
+          opacity: 1,
+          smoothFactor: 1.25,
+          stroke: true,
+          color: "#FFA500",
+        });
+
+        const points = segmentRoutePolyLine.getLatLngs();
+
+        const arrowsPerSegmentToShow = 5;
+        const step = (points.length - 1) / (arrowsPerSegmentToShow + 1);
+
+        for (let i = 1; i <= arrowsPerSegmentToShow; i++) {
           const index = Math.floor(step * i);
           const prevIndex = Math.floor(index - 1);
-          
+
           if (prevIndex >= 0 && index < points.length) {
-            const rotationAngle = this.getRotationAngle(points[index], points[prevIndex]);
-            
+            const rotationAngle = this.getRotationAngle(
+              points[index],
+              points[prevIndex]
+            );
+
             const midPoint = L.latLng(
               (points[prevIndex].lat + points[index].lat) / 2,
               (points[prevIndex].lng + points[index].lng) / 2
             );
-            
+
             const arrowIcon = L.divIcon({
               html: `<div style="
-                width: 14px;
-                height: 14px;
-                background-image: url(${this.arrowMarker});
-                transform: rotate(${rotationAngle}deg);
-              "></div>`,
-              className: 'arrow-marker',
+                          width: 14px;
+                          height: 14px;
+                          background-image: url(${this.arrowMarker});
+                          transform: rotate(${rotationAngle}deg);
+                      "></div>`,
+              className: "arrow-marker",
               iconSize: [14, 14],
               iconAnchor: [7, 7],
             });
-            
+
             L.marker(midPoint, { icon: arrowIcon }).addTo(rawLayer);
           }
         }
 
-        rawLayer.addLayer(route);
-      });
+        rawLayer.addLayer(segmentRoutePolyLineBorder);
+        rawLayer.addLayer(segmentRoutePolyLine);
+      }
+
+      // routeSegments.forEach((segment) => {
+      //   const segmentCoordinates = segment.coordinates.map((location) => [
+      //     location.latitude,
+      //     location.longitude,
+      //   ]);
+
+      //   const segmentRoutePolyLineBorder = L.polyline(segmentCoordinates, {
+      //     color: '#000000',
+      //     weight: 9,
+      //     opacity: 1,
+      //     smoothFactor: 1.25,
+      //   });
+
+      //   const segmentRoutePolyLine = L.polyline(segmentCoordinates, {
+      //     weight: 7,
+      //     opacity: 1,
+      //     smoothFactor: 1.25,
+      //     stroke: true,
+      //     color: "#FFA500",
+      //   });
+
+      //   const points = segmentRoutePolyLine.getLatLngs();
+
+      //   const arrowsPerSegmentToShow = 5;
+      //   const step = (points.length - 1) / (arrowsPerSegmentToShow + 1);
+
+      //   for (let i = 1; i <= arrowsPerSegmentToShow; i++) {
+      //     const index = Math.floor(step * i);
+      //     const prevIndex = Math.floor(index - 1);
+
+      //     if (prevIndex >= 0 && index < points.length) {
+      //       const rotationAngle = this.getRotationAngle(points[index], points[prevIndex]);
+
+      //       const midPoint = L.latLng(
+      //         (points[prevIndex].lat + points[index].lat) / 2,
+      //         (points[prevIndex].lng + points[index].lng) / 2
+      //       );
+
+      //       const arrowIcon = L.divIcon({
+      //         html: `<div style="
+      //           width: 14px;
+      //           height: 14px;
+      //           background-image: url(${this.arrowMarker});
+      //           transform: rotate(${rotationAngle}deg);
+      //         "></div>`,
+      //         className: 'arrow-marker',
+      //         iconSize: [14, 14],
+      //         iconAnchor: [7, 7],
+      //       });
+
+      //       L.marker(midPoint, { icon: arrowIcon }).addTo(rawLayer);
+      //     }
+      //   }
+
+      //   rawLayer.addLayer(segmentRoutePolyLineBorder);
+      //   rawLayer.addLayer(segmentRoutePolyLine);
+      // });
     },
     getRotationAngle(p1, p2) {
-      return (Math.atan2(p2.lng - p1.lng, p2.lat - p1.lat) * 180 / Math.PI) - 90;
+      return (
+        (Math.atan2(p2.lng - p1.lng, p2.lat - p1.lat) * 180) / Math.PI - 90
+      );
     },
     centerMapOnLocation(latitude, longitude) {
       const customZoomLevel = 16;
       if (this.map) {
-        toRaw(this.map).flyTo(
-          [latitude, longitude],
-          customZoomLevel,
-          {
-            duration: 1, // Duration in seconds
-            easeLinearity: 0.25,
-          }
-        );
+        toRaw(this.map).flyTo([latitude, longitude], customZoomLevel, {
+          duration: 1,
+          easeLinearity: 0.25,
+        });
       }
     },
     handleStepChange(step) {
