@@ -322,7 +322,7 @@ export default {
       );
     },
     centerMapOnLocation(latitude, longitude, routeDisplayMode) {
-      const customZoomLevel = routeDisplayMode.showFullRoute ? 16 : 18;
+      const customZoomLevel = routeDisplayMode.showFullRoute ? 16 : 17;
       const easeLinearity = routeDisplayMode.showFullRoute ? 0.25 : 1;
       const duration = routeDisplayMode.showFullRoute ? 1 : 0.5;
       if (this.map) {
