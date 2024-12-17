@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from redis import Redis
 from typing import List, Tuple
 from psycopg2.extensions import cursor
 
@@ -21,12 +22,19 @@ def get_optimized_routes(
     employees_to_bus_clusters: dict,
     company_node: Node,
     cursor: cursor,
+    redis_client: Redis
 ) -> OptimizeResponse:
     optimized_routes = []
+    total_clusters = len(employees_to_bus_clusters)
+    progress_step = 100 / total_clusters
+    redis_client.set("optimization_progress", 0)
 
-    for bus_id, employee_indices in tqdm(
-        employees_to_bus_clusters.items(),
-        total=len(employees_to_bus_clusters)
+    for index, (bus_id, employee_indices) in enumerate(
+        tqdm(
+            employees_to_bus_clusters.items(),
+            desc="Optimizing routes",
+            total=total_clusters
+        )
     ):
         if not employee_indices:
             continue
@@ -58,6 +66,9 @@ def get_optimized_routes(
             total_duration=calculate_total_duration(route_segments),
             route_segments=route_segments
         ))
+
+        current_progress = int((index + 1) * progress_step)
+        redis_client.set("optimization_progress", current_progress)
 
     return OptimizeResponse(status="success", data=optimized_routes)
 
