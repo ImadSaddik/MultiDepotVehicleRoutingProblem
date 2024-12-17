@@ -16,6 +16,10 @@ export default {
     companyData: {},
     showEmployees: true,
     showBuses: true,
+    routeDisplay: {
+      type: Object,
+      default: () => ({ showFullRoute: true, selectedSegment: 0 }),
+    },
   },
   setup() {
     const store = dataStore();
@@ -78,6 +82,15 @@ export default {
     },
     "store.selectedCluster"() {
       this.updateRouteIfVisible();
+    },
+    routeDisplay: {
+      handler(newValue) {
+        if (newValue) {
+          this.store.setRouteDisplayMode(newValue);
+          this.updateRouteIfVisible();
+        }
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -209,139 +222,119 @@ export default {
       const routeSegments = clusterData["route_segments"];
       const busNode = clusterData["bus_node"];
 
-      this.centerMapOnLocation(busNode.latitude, busNode.longitude);
+      const displayMode = this.store.routeDisplayMode || {
+        showFullRoute: true,
+        selectedSegment: 0,
+      };
 
-      const firstSegment = routeSegments[0];
-      if (firstSegment) {
-        const segmentCoordinates = firstSegment.coordinates.map((location) => [
+      if (displayMode.showFullRoute) {
+        this.centerMapOnLocation(
+          busNode.latitude,
+          busNode.longitude,
+          displayMode
+        );
+        this.drawAllSegments(routeSegments, rawLayer);
+      } else {
+        const selectedSegment = routeSegments[displayMode.selectedSegment];
+        const segmentStartingPoint = selectedSegment.coordinates[0];
+
+        this.centerMapOnLocation(
+          segmentStartingPoint.latitude,
+          segmentStartingPoint.longitude,
+          displayMode
+        );
+        this.drawSingleSegment(selectedSegment, rawLayer);
+      }
+    },
+    drawAllSegments(segments, layer) {
+      segments.forEach((segment) => {
+        const coordinates = segment.coordinates.map((location) => [
           location.latitude,
           location.longitude,
         ]);
 
-        const segmentRoutePolyLineBorder = L.polyline(segmentCoordinates, {
-          color: "#000000",
-          weight: 9,
-          opacity: 1,
-          smoothFactor: 1.25,
-        });
+        this.drawSegment(coordinates, layer);
+      });
+    },
+    drawSingleSegment(segment, layer) {
+      if (!segment) return;
 
-        const segmentRoutePolyLine = L.polyline(segmentCoordinates, {
-          weight: 7,
-          opacity: 1,
-          smoothFactor: 1.25,
-          stroke: true,
-          color: "#FFA500",
-        });
+      const coordinates = segment.coordinates.map((location) => [
+        location.latitude,
+        location.longitude,
+      ]);
 
-        const points = segmentRoutePolyLine.getLatLngs();
+      this.drawSegment(coordinates, layer);
+    },
+    drawSegment(coordinates, layer) {
+      const polylineBorder = L.polyline(coordinates, {
+        color: "#000000",
+        weight: 9,
+        opacity: 1,
+        smoothFactor: 1.25,
+      });
 
-        const arrowsPerSegmentToShow = 5;
-        const step = (points.length - 1) / (arrowsPerSegmentToShow + 1);
+      const polyline = L.polyline(coordinates, {
+        weight: 7,
+        opacity: 1,
+        smoothFactor: 1.25,
+        stroke: true,
+        color: "#FFA500",
+      });
 
-        for (let i = 1; i <= arrowsPerSegmentToShow; i++) {
-          const index = Math.floor(step * i);
-          const prevIndex = Math.floor(index - 1);
+      this.addArrowsToSegment(polyline, layer);
 
-          if (prevIndex >= 0 && index < points.length) {
-            const rotationAngle = this.getRotationAngle(
-              points[index],
-              points[prevIndex]
-            );
+      layer.addLayer(polylineBorder);
+      layer.addLayer(polyline);
+    },
+    addArrowsToSegment(polyline, layer) {
+      const points = polyline.getLatLngs();
+      const arrowsPerSegment = 5;
+      const step = (points.length - 1) / (arrowsPerSegment + 1);
 
-            const midPoint = L.latLng(
-              (points[prevIndex].lat + points[index].lat) / 2,
-              (points[prevIndex].lng + points[index].lng) / 2
-            );
+      for (let i = 1; i <= arrowsPerSegment; i++) {
+        const index = Math.floor(step * i);
+        const prevIndex = Math.floor(index - 1);
 
-            const arrowIcon = L.divIcon({
-              html: `<div style="
-                          width: 14px;
-                          height: 14px;
-                          background-image: url(${this.arrowMarker});
-                          transform: rotate(${rotationAngle}deg);
-                      "></div>`,
-              className: "arrow-marker",
-              iconSize: [14, 14],
-              iconAnchor: [7, 7],
-            });
+        if (prevIndex >= 0 && index < points.length) {
+          const rotationAngle = this.getRotationAngle(
+            points[index],
+            points[prevIndex]
+          );
+          const midPoint = L.latLng(
+            (points[prevIndex].lat + points[index].lat) / 2,
+            (points[prevIndex].lng + points[index].lng) / 2
+          );
 
-            L.marker(midPoint, { icon: arrowIcon }).addTo(rawLayer);
-          }
+          const arrowIcon = L.divIcon({
+            html: `<div style="
+              width: 14px;
+              height: 14px;
+              background-image: url(${this.arrowMarker});
+              transform: rotate(${rotationAngle}deg);
+            "></div>`,
+            className: "arrow-marker",
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+          });
+
+          L.marker(midPoint, { icon: arrowIcon }).addTo(layer);
         }
-
-        rawLayer.addLayer(segmentRoutePolyLineBorder);
-        rawLayer.addLayer(segmentRoutePolyLine);
       }
-
-      // routeSegments.forEach((segment) => {
-      //   const segmentCoordinates = segment.coordinates.map((location) => [
-      //     location.latitude,
-      //     location.longitude,
-      //   ]);
-
-      //   const segmentRoutePolyLineBorder = L.polyline(segmentCoordinates, {
-      //     color: '#000000',
-      //     weight: 9,
-      //     opacity: 1,
-      //     smoothFactor: 1.25,
-      //   });
-
-      //   const segmentRoutePolyLine = L.polyline(segmentCoordinates, {
-      //     weight: 7,
-      //     opacity: 1,
-      //     smoothFactor: 1.25,
-      //     stroke: true,
-      //     color: "#FFA500",
-      //   });
-
-      //   const points = segmentRoutePolyLine.getLatLngs();
-
-      //   const arrowsPerSegmentToShow = 5;
-      //   const step = (points.length - 1) / (arrowsPerSegmentToShow + 1);
-
-      //   for (let i = 1; i <= arrowsPerSegmentToShow; i++) {
-      //     const index = Math.floor(step * i);
-      //     const prevIndex = Math.floor(index - 1);
-
-      //     if (prevIndex >= 0 && index < points.length) {
-      //       const rotationAngle = this.getRotationAngle(points[index], points[prevIndex]);
-
-      //       const midPoint = L.latLng(
-      //         (points[prevIndex].lat + points[index].lat) / 2,
-      //         (points[prevIndex].lng + points[index].lng) / 2
-      //       );
-
-      //       const arrowIcon = L.divIcon({
-      //         html: `<div style="
-      //           width: 14px;
-      //           height: 14px;
-      //           background-image: url(${this.arrowMarker});
-      //           transform: rotate(${rotationAngle}deg);
-      //         "></div>`,
-      //         className: 'arrow-marker',
-      //         iconSize: [14, 14],
-      //         iconAnchor: [7, 7],
-      //       });
-
-      //       L.marker(midPoint, { icon: arrowIcon }).addTo(rawLayer);
-      //     }
-      //   }
-
-      //   rawLayer.addLayer(segmentRoutePolyLineBorder);
-      //   rawLayer.addLayer(segmentRoutePolyLine);
-      // });
     },
     getRotationAngle(p1, p2) {
       return (
-        (Math.atan2(p2.lng - p1.lng, p2.lat - p1.lat) * 180) / Math.PI - 90
+        (Math.atan2(p2.lng - p1.lng, p1.lat - p2.lat) * 180) / Math.PI - 90
       );
     },
-    centerMapOnLocation(latitude, longitude) {
-      const customZoomLevel = 16;
+    centerMapOnLocation(latitude, longitude, displayMode) {
+      const customZoomLevel = displayMode.showFullRoute ? 16 : 18;
+      const easeLinearity = displayMode.showFullRoute ? 0.25 : 1;
+      const duration = displayMode.showFullRoute ? 1 : 0.5;
       if (this.map) {
         toRaw(this.map).flyTo([latitude, longitude], customZoomLevel, {
-          duration: 1,
-          easeLinearity: 0.25,
+          duration: duration,
+          easeLinearity: easeLinearity,
         });
       }
     },
