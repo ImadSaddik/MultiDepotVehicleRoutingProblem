@@ -232,7 +232,7 @@ export default {
         busData: [clusterData["bus_node"]],
         employeeData: clusterData["employee_nodes"],
         companyData: clusterData["company_node"],
-        routeDisplay: {
+        routeDisplayMode: {
           showFullRoute: this.showFullRoute,
           selectedSegment: this.selectedSegment,
         },

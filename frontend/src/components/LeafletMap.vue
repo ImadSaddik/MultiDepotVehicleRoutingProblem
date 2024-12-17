@@ -16,7 +16,7 @@ export default {
     companyData: {},
     showEmployees: true,
     showBuses: true,
-    routeDisplay: {
+    routeDisplayMode: {
       type: Object,
       default: () => ({ showFullRoute: true, selectedSegment: 0 }),
     },
@@ -83,7 +83,7 @@ export default {
     "store.selectedCluster"() {
       this.updateRouteIfVisible();
     },
-    routeDisplay: {
+    routeDisplayMode: {
       handler(newValue) {
         if (newValue) {
           this.updateRouteIfVisible();
@@ -221,26 +221,21 @@ export default {
       const routeSegments = clusterData["route_segments"];
       const busNode = clusterData["bus_node"];
 
-      const displayMode = this.store.routeDisplayMode || {
-        showFullRoute: true,
-        selectedSegment: 0,
-      };
-
-      if (displayMode.showFullRoute) {
+      if (this.routeDisplayMode.showFullRoute) {
         this.centerMapOnLocation(
           busNode.latitude,
           busNode.longitude,
-          displayMode
+          this.routeDisplayMode
         );
         this.drawAllSegments(routeSegments, rawLayer);
       } else {
-        const selectedSegment = routeSegments[displayMode.selectedSegment];
+        const selectedSegment = routeSegments[this.routeDisplayMode.selectedSegment];
         const segmentStartingPoint = selectedSegment.coordinates[0];
 
         this.centerMapOnLocation(
           segmentStartingPoint.latitude,
           segmentStartingPoint.longitude,
-          displayMode
+          this.routeDisplayMode
         );
         this.drawSingleSegment(selectedSegment, rawLayer);
       }
@@ -326,10 +321,10 @@ export default {
         (Math.atan2(p2.lng - p1.lng, p1.lat - p2.lat) * 180) / Math.PI - 90
       );
     },
-    centerMapOnLocation(latitude, longitude, displayMode) {
-      const customZoomLevel = displayMode.showFullRoute ? 16 : 18;
-      const easeLinearity = displayMode.showFullRoute ? 0.25 : 1;
-      const duration = displayMode.showFullRoute ? 1 : 0.5;
+    centerMapOnLocation(latitude, longitude, routeDisplayMode) {
+      const customZoomLevel = routeDisplayMode.showFullRoute ? 16 : 18;
+      const easeLinearity = routeDisplayMode.showFullRoute ? 0.25 : 1;
+      const duration = routeDisplayMode.showFullRoute ? 1 : 0.5;
       if (this.map) {
         toRaw(this.map).flyTo([latitude, longitude], customZoomLevel, {
           duration: duration,

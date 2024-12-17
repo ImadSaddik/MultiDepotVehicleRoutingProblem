@@ -3,7 +3,7 @@
     :employeeData="employeeData"
     :busData="busData"
     :companyData="companyData"
-    :routeDisplay="routeDisplay"
+    :routeDisplayMode="routeDisplayMode"
     :showEmployees="showEmployees"
     :showBuses="showBuses"
   />
@@ -43,7 +43,7 @@ export default {
       showEmployees: true,
       showBuses: true,
       isSidePanelOpen: true,
-      routeDisplay: {
+      routeDisplayMode: {
         showFullRoute: true,
         selectedSegment: 0,
       }
@@ -56,11 +56,11 @@ export default {
     handleClusterData(data) {
       this.updateData(data);
     },
-    updateData({ employeeData, busData, companyData, routeDisplay }) {
+    updateData({ employeeData, busData, companyData, routeDisplayMode }) {
       this.employeeData = employeeData;
       this.busData = busData;
       this.companyData = companyData;
-      this.routeDisplay = routeDisplay;
+      this.routeDisplayMode = routeDisplayMode;
     },
     handleEmployeeToggleSwitchChange(value) {
       this.showEmployees = value;
