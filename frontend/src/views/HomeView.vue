@@ -3,8 +3,9 @@
     :employeeData="employeeData"
     :busData="busData"
     :companyData="companyData"
-    :showEmployees
-    :showBuses
+    :routeDisplay="routeDisplay"
+    :showEmployees="showEmployees"
+    :showBuses="showBuses"
   />
   <Button 
     :icon="isSidePanelOpen ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" 
@@ -41,7 +42,11 @@ export default {
       companyData: {},
       showEmployees: true,
       showBuses: true,
-      isSidePanelOpen: true
+      isSidePanelOpen: true,
+      routeDisplay: {
+        showFullRoute: true,
+        selectedSegment: 0,
+      }
     };
   },
   methods: {
@@ -51,10 +56,11 @@ export default {
     handleClusterData(data) {
       this.updateData(data);
     },
-    updateData({ employeeData, busData, companyData }) {
+    updateData({ employeeData, busData, companyData, routeDisplay }) {
       this.employeeData = employeeData;
       this.busData = busData;
       this.companyData = companyData;
+      this.routeDisplay = routeDisplay;
     },
     handleEmployeeToggleSwitchChange(value) {
       this.showEmployees = value;

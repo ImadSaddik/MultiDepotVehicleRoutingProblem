@@ -27,6 +27,39 @@
       />
     </div>
 
+    <div class="segment-controls">
+      <p style="margin: 0px;">
+        The route is divided into segments. You can view the full route or view each segment individually.
+      </p>
+      
+      <div class="segment-mode-toggle">
+        <ToggleButton
+          v-model="showFullRoute"
+          onLabel="Full route"
+          offLabel="Segment view"
+          class="w-full"
+        />
+      </div>
+
+      <div v-if="!showFullRoute" class="segment-navigation">
+        <Button 
+          :disabled="selectedSegment === 0"
+          icon="pi pi-chevron-left"
+          class="toggle-button"
+          @click="showPreviousSegment" 
+        />
+
+        <p>Segment {{ selectedSegment + 1 }} of {{ totalSegments }}</p>
+
+        <Button 
+          :disabled="selectedSegment === totalSegments - 1"
+          icon="pi pi-chevron-right"
+          class="toggle-button" 
+          @click="showNextSegment" 
+        />
+      </div>
+    </div>
+
     <Divider class="custom-divider" />
 
     <h2>Route statistics</h2>
@@ -87,20 +120,23 @@
 </template>
 
 <script>
+import { toRaw } from "vue";
 import { dataStore } from "@/store/dataStore";
+
+import Card from 'primevue/card';
 import Toast from "primevue/toast";
 import Button from "primevue/button";
-import Card from 'primevue/card';
 import Divider from 'primevue/divider';
-import { toRaw } from "vue";
+import ToggleButton from 'primevue/togglebutton';
 
 export default {
   name: "SidePanelStep4",
   components: {
+    Card,
     Toast,
     Button,
-    Card,
     Divider,
+    ToggleButton,
   },
   setup() {
     const store = dataStore();
@@ -109,6 +145,8 @@ export default {
   data() {
     return {
       selectedCluster: 0,
+      selectedSegment: 0,
+      showFullRoute: true,
     };
   },
   watch: {
@@ -119,6 +157,12 @@ export default {
       if (val === 4) {
         this.$emit("cluster-selected", this.getClusterData());
       }
+    },
+    showFullRoute() {
+      this.$emit("cluster-selected", this.getClusterData());
+    },
+    selectedSegment() {
+      this.$emit("cluster-selected", this.getClusterData());
     },
   },
   computed: {
@@ -135,7 +179,10 @@ export default {
     },
     passengerCount() {
       return this.currentClusterData?.employee_nodes?.length || 0;
-    }
+    },
+    totalSegments() {
+      return this.currentClusterData?.route_segments?.length || 0;
+    },
   },
   methods: {
     goToPreviousStep() {
@@ -169,12 +216,26 @@ export default {
       this.selectedCluster = this.selectedCluster - 1;
       this.store.setSelectedCluster(this.selectedCluster);
     },
+    showNextSegment() {
+      if (this.selectedSegment < this.totalSegments - 1) {
+        this.selectedSegment++;
+      }
+    },
+    showPreviousSegment() {
+      if (this.selectedSegment > 0) {
+        this.selectedSegment--;
+      }
+    },
     getClusterData() {
       const clusterData = toRaw(this.store.optimizedData[this.selectedCluster]);
       return {
         busData: [clusterData["bus_node"]],
         employeeData: clusterData["employee_nodes"],
         companyData: clusterData["company_node"],
+        routeDisplay: {
+          showFullRoute: this.showFullRoute,
+          selectedSegment: this.selectedSegment,
+        },
       };
     },
   },
@@ -236,5 +297,33 @@ export default {
 
 :deep(.p-card) {
   border-radius: 0.5rem;
+}
+
+.segment-controls {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.segment-mode-toggle {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.segment-navigation {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+:deep(.p-togglebutton) {
+  width: 100%;
+}
+
+:deep(.p-togglebutton.p-highlight) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
 }
 </style>
