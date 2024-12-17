@@ -28,6 +28,8 @@
       @click="startSolver"
     />
 
+    <ProgressBar :value="optimizationProgress" class="progress-bar" />
+
     <Toast position="bottom-left" />
 
     <div class="navigation-buttons">
@@ -56,6 +58,8 @@ import Toast from "primevue/toast";
 import Button from "primevue/button";
 import Select from "primevue/select";
 import Divider from "primevue/divider";
+import ProgressBar from "primevue/progressbar";
+
 import axios from "axios";
 
 export default {
@@ -65,6 +69,7 @@ export default {
     Button,
     Select,
     Divider,
+    ProgressBar,
   },
   setup() {
     const store = dataStore();
@@ -81,6 +86,10 @@ export default {
       isSolving: false,
       isResultAvailable: false,
       isSolverInvalid: false,
+      optimizationProgress: 0,
+      POLLING_DURATION_MS: 100,
+      COMPLETION_PERCENTAGE: 100,
+      TOAST_DURATION: 5000,
     };
   },
   methods: {
@@ -97,12 +106,14 @@ export default {
           severity: "error",
           summary: "Validation error",
           detail: "Please select a solver",
-          life: 5000,
+          life: this.TOAST_DURATION,
         });
         return;
       }
       this.isSolverInvalid = false;
       this.isSolving = true;
+
+      this.fetchOptimizationProgress();
 
       const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize/`;
       await axios
@@ -116,7 +127,7 @@ export default {
             severity: "success",
             summary: "Optimization success",
             detail: "The routes have been optimized",
-            life: 5000,
+            life: this.TOAST_DURATION,
           });
         })
         .catch((error) => {
@@ -127,8 +138,39 @@ export default {
             severity: "error",
             summary: "Optimization error",
             detail: error.response.data.message,
-            life: 5000,
+            life: this.TOAST_DURATION,
           });
+        });
+    },
+    async fetchOptimizationProgress() {
+      try {
+        const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize/progress/`;
+        const response = await axios.get(endpointUrl);
+
+        this.optimizationProgress = response.data.progress;
+
+        if (this.optimizationProgress < this.COMPLETION_PERCENTAGE) {
+          setTimeout(this.fetchOptimizationProgress, this.POLLING_DURATION_MS);
+        } else {
+          this.isSolving = false;
+          await this.resetOptimizationProgress();
+        }
+      } catch (error) {
+        this.$toast.add({
+          severity: "error",
+          summary: "Progress error",
+          detail: error.response.data.message,
+          life: this.TOAST_DURATION,
+        });
+      }
+    },
+    async resetOptimizationProgress() {
+      await axios
+        .post(`${axios.defaults.baseURL}/api/v1/optimize/reset-progress/`)
+        .then(() => {})
+        .catch((error) => {
+          console.error("Error resetting progress", error);
+          this.isSolving = false;
         });
     },
   },
@@ -161,5 +203,10 @@ export default {
 
 .p-invalid {
   border-color: var(--red-500) !important;
+}
+
+.progress-bar {
+  margin-top: 1rem;
+  height: 1.5rem;
 }
 </style>
