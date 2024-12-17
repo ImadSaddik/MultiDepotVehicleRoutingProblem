@@ -87,19 +87,20 @@
 </template>
 
 <script>
+import { toRaw } from "vue";
 import { dataStore } from "@/store/dataStore";
+
+import Card from 'primevue/card';
 import Toast from "primevue/toast";
 import Button from "primevue/button";
-import Card from 'primevue/card';
 import Divider from 'primevue/divider';
-import { toRaw } from "vue";
 
 export default {
   name: "SidePanelStep4",
   components: {
+    Card,
     Toast,
     Button,
-    Card,
     Divider,
   },
   setup() {
