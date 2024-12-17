@@ -8,10 +8,6 @@ export const dataStore = defineStore("data", {
     sidePanelStep: 1,
     optimizedData: [],
     selectedCluster: 0,
-    routeDisplayMode: {
-      showFullRoute: true,
-      selectedSegment: 0,
-    },
   }),
   actions: {
     setEmployeeData(data) {
@@ -31,9 +27,6 @@ export const dataStore = defineStore("data", {
     },
     setSelectedCluster(cluster) {
       this.selectedCluster = cluster;
-    },
-    setRouteDisplayMode(mode) {
-      this.routeDisplayMode = mode;
     },
   },
 });
