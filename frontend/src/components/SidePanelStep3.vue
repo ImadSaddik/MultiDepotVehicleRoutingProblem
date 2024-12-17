@@ -40,7 +40,7 @@
         @click="goToPreviousStep"
       />
       <Button
-        :disabled="!isSolving && !isResultAvailable"
+        :disabled="isSolving"
         label="Next"
         icon="pi pi-arrow-right"
         iconPos="right"
@@ -113,6 +113,7 @@ export default {
       this.isSolverInvalid = false;
       this.isSolving = true;
 
+      await this.resetOptimizationProgress();
       this.fetchOptimizationProgress();
 
       const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize/`;
@@ -153,7 +154,6 @@ export default {
           setTimeout(this.fetchOptimizationProgress, this.POLLING_DURATION_MS);
         } else {
           this.isSolving = false;
-          await this.resetOptimizationProgress();
         }
       } catch (error) {
         this.$toast.add({
