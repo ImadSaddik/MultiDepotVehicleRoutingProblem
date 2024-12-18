@@ -119,6 +119,8 @@ export default {
           "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
       }).addTo(toRaw(this.map));
       L.control.attribution({ position: "bottomleft" }).addTo(toRaw(this.map));
+
+      this.map.on('zoomend', this.updateZoomControls);
     },
     initializeIcons() {
       this.employeeIcon = L.divIcon({
@@ -379,6 +381,23 @@ export default {
     updateRouteIfVisible() {
       if (this.map && this.routeLayer && this.store.sidePanelStep === 4) {
         this.updateRouteLayer();
+      }
+    },
+    updateZoomControls() {
+      const zoomInButton = document.querySelector('.leaflet-control-zoom-in');
+      const zoomOutButton = document.querySelector('.leaflet-control-zoom-out');
+      const currentZoom = this.map.getZoom();
+
+      if (currentZoom >= 18) {
+        zoomInButton.classList.add('leaflet-disabled');
+      } else {
+        zoomInButton.classList.remove('leaflet-disabled');
+      }
+
+      if (currentZoom <= 0) {
+        zoomOutButton.classList.add('leaflet-disabled');
+      } else {
+        zoomOutButton.classList.remove('leaflet-disabled');
       }
     },
   },

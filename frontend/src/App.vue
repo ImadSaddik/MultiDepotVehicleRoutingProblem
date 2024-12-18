@@ -40,6 +40,12 @@ h1 {
   transition: background-color 0.2s, color 0.2s, border-color 0.2s !important;
 }
 
+.leaflet-control-zoom-in.leaflet-disabled,
+.leaflet-control-zoom-out.leaflet-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
 .leaflet-control-zoom-out {
   margin-top: 0.5rem;
 }
