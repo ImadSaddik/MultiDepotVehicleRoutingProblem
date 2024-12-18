@@ -28,7 +28,7 @@
       @click="startSolver"
     />
 
-    <ProgressBar :value="optimizationProgress" class="progress-bar" />
+    <ProgressBar :value="optimizationProgress" class="progress-bar" v-show="isSolving" />
 
     <Toast position="bottom-left" />
 
