@@ -106,7 +106,7 @@ export default {
 
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14">
-          <path d="M 0,7 L 12,0 L 12,14 Z" fill="blue" opacity="0.7"/>
+          <polyline points="2,2 7,7 2,12" fill="none" stroke="blue" stroke-width="2"/>
         </svg>
       `;
 
@@ -283,42 +283,44 @@ export default {
     },
     addArrowsToSegment(polyline, layer) {
       const points = polyline.getLatLngs();
-      const arrowsPerSegment = 5;
-      const step = (points.length - 1) / (arrowsPerSegment + 1);
+      const numArrows = 5;
+      const numPoints = points.length;
+      const indices = [];
 
-      for (let i = 1; i <= arrowsPerSegment; i++) {
-        const index = Math.floor(step * i);
-        const prevIndex = Math.floor(index - 1);
-
-        if (prevIndex >= 0 && index < points.length) {
-          const rotationAngle = this.getRotationAngle(
-            points[index],
-            points[prevIndex]
-          );
-          const midPoint = L.latLng(
-            (points[prevIndex].lat + points[index].lat) / 2,
-            (points[prevIndex].lng + points[index].lng) / 2
-          );
-
-          const arrowIcon = L.divIcon({
-            html: `<div style="
-              width: 14px;
-              height: 14px;
-              background-image: url(${this.arrowMarker});
-              transform: rotate(${rotationAngle}deg);
-            "></div>`,
-            className: "arrow-marker",
-            iconSize: [14, 14],
-            iconAnchor: [7, 7],
-          });
-
-          L.marker(midPoint, { icon: arrowIcon }).addTo(layer);
-        }
+      for (let i = 0; i < numArrows; i++) {
+        const step = (numPoints - 1) / (numArrows - 1);
+        const index = Math.floor(i * step);
+        indices.push(index);
       }
+
+      indices.forEach((index) => {
+        let rotationAngle;
+        if (index < numPoints - 1) {
+          rotationAngle = this.getRotationAngle(points[index], points[index + 1]);
+        } else if (index > 0) {
+          rotationAngle = this.getRotationAngle(points[index - 1], points[index]);
+        } else {
+          rotationAngle = 0;
+        }
+
+        const arrowIcon = L.divIcon({
+          html: `<div style="
+            width: 14px;
+            height: 14px;
+            background-image: url(${this.arrowMarker});
+            transform: rotate(${rotationAngle}deg);
+          "></div>`,
+          className: "arrow-marker",
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+        });
+
+        L.marker(points[index], { icon: arrowIcon }).addTo(layer);
+      });
     },
     getRotationAngle(p1, p2) {
       return (
-        (Math.atan2(p2.lng - p1.lng, p1.lat - p2.lat) * 180) / Math.PI - 90
+        (Math.atan2(p2.lat - p1.lat, p1.lng - p2.lng) * 180) / Math.PI - 180
       );
     },
     centerMapOnLocation(latitude, longitude, routeDisplayMode) {
