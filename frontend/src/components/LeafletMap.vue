@@ -105,8 +105,8 @@ export default {
       );
 
       const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14">
-          <polyline points="2,2 7,7 2,12" fill="none" stroke="blue" stroke-width="2"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+          <polyline points="4,4 14,14 4,24" fill="none" stroke="black" stroke-width="3"/>
         </svg>
       `;
 
@@ -305,14 +305,14 @@ export default {
 
         const arrowIcon = L.divIcon({
           html: `<div style="
-            width: 14px;
-            height: 14px;
+            width: 28px;
+            height: 28px;
             background-image: url(${this.arrowMarker});
             transform: rotate(${rotationAngle}deg);
           "></div>`,
           className: "arrow-marker",
-          iconSize: [14, 14],
-          iconAnchor: [7, 7],
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
         });
 
         L.marker(points[index], { icon: arrowIcon }).addTo(layer);
