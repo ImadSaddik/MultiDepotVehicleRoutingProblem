@@ -99,10 +99,12 @@ export default {
   },
   methods: {
     initializeMap() {
-      this.map = L.map("map", { attributionControl: false }).setView(
-        this.centerCoordinates,
-        this.zoomLevel
-      );
+      this.map = L.map("map", {
+        attributionControl: false,
+        zoomSnap: 0.25,
+        zoomDelta: 0.5,
+        wheelPxPerZoomLevel: 120, 
+      }).setView(this.centerCoordinates, this.zoomLevel);
 
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28">
