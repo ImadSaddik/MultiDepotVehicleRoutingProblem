@@ -38,6 +38,8 @@ export default {
       busIcon: null,
       companyIcon: null,
       arrowMarker: null,
+      arrowMarkerInstance: null,
+      animationFrame: null,
     };
   },
   watch: {
@@ -263,6 +265,7 @@ export default {
       ]);
 
       this.drawSegment(coordinates, layer, segment);
+      this.animateArrowAlongSegment(coordinates, layer);
     },
     drawSegment(coordinates, layer, segment = null) {
       const polylineBorder = L.polyline(coordinates, {
@@ -295,52 +298,8 @@ export default {
         polyline.bindTooltip(tooltipContent, { sticky: true });
       }
 
-      this.addArrowsToSegment(polyline, layer);
-
       layer.addLayer(polylineBorder);
       layer.addLayer(polyline);
-    },
-    addArrowsToSegment(polyline, layer) {
-      const points = polyline.getLatLngs();
-      const numArrows = 5;
-      const numPoints = points.length;
-      const indices = [];
-
-      for (let i = 0; i < numArrows; i++) {
-        const step = (numPoints - 1) / (numArrows - 1);
-        const index = Math.floor(i * step);
-        indices.push(index);
-      }
-
-      indices.forEach((index) => {
-        let rotationAngle;
-        if (index < numPoints - 1) {
-          rotationAngle = this.getRotationAngle(points[index], points[index + 1]);
-        } else if (index > 0) {
-          rotationAngle = this.getRotationAngle(points[index - 1], points[index]);
-        } else {
-          rotationAngle = 0;
-        }
-
-        const arrowIcon = L.divIcon({
-          html: `<div style="
-            width: 28px;
-            height: 28px;
-            background-image: url(${this.arrowMarker});
-            transform: rotate(${rotationAngle}deg);
-          "></div>`,
-          className: "arrow-marker",
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-        });
-
-        L.marker(points[index], { icon: arrowIcon }).addTo(layer);
-      });
-    },
-    getRotationAngle(p1, p2) {
-      return (
-        (Math.atan2(p2.lat - p1.lat, p1.lng - p2.lng) * 180) / Math.PI - 180
-      );
     },
     centerMapOnLocation(latitude, longitude, routeDisplayMode) {
       const customZoomLevel = routeDisplayMode.showFullRoute ? 16 : 17;
@@ -415,6 +374,103 @@ export default {
         zoomOutButton.classList.remove('leaflet-disabled');
       }
     },
+    animateArrowAlongSegment(coordinates, layer) {
+      // Create a single arrow marker
+      const arrowMarker = L.marker(coordinates[0], { icon: L.divIcon() }).addTo(layer);
+      this.arrowMarkerInstance = arrowMarker;
+
+      // Calculate the total length of the segment
+      let totalDistance = 0;
+      for (let i = 1; i < coordinates.length; i++) {
+        totalDistance += this.map.distance(coordinates[i - 1], coordinates[i]);
+      }
+
+      const arrowSpeedInMeterPerSecond = 100;
+      const totalDurationInSeconds = totalDistance / arrowSpeedInMeterPerSecond;
+
+      const startTime = performance.now();
+
+      const animate = () => {
+        const currentTime = performance.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+
+        let progress = (elapsedTimeInSeconds % totalDurationInSeconds) / totalDurationInSeconds;
+
+        const latlng = this.interpolatePointOnLine(coordinates, progress);
+        const latlngObject = { lat: latlng[0], lng: latlng[1] };
+        arrowMarker.setLatLng(latlng);
+
+        const nextProgress = (progress + 0.0001) % 1;
+        const nextLatLng = this.interpolatePointOnLine(coordinates, nextProgress);
+        const nextLatLngObject = { lat: nextLatLng[0], lng: nextLatLng[1] };
+        const angle = this.getRotationAngle(latlngObject, nextLatLngObject);
+
+        const arrowIcon = L.divIcon({
+          html: `<div style="
+            width: 28px;
+            height: 28px;
+            background-image: url(${this.arrowMarker});
+            transform: rotate(${angle}deg);
+          "></div>`,
+          className: "arrow-marker",
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        });
+
+        arrowMarker.setIcon(arrowIcon);
+
+        this.animationFrame = requestAnimationFrame(animate);
+      };
+
+      animate();
+    },
+
+    interpolatePointOnLine(coordinates, progress) {
+      let totalDistance = 0;
+      const distances = [];
+
+      for (let i = 1; i < coordinates.length; i++) {
+        const distance = this.map.distance(coordinates[i - 1], coordinates[i]);
+        distances.push(distance);
+        totalDistance += distance;
+      }
+
+      let accumulatedDistance = 0;
+      const targetDistance = progress * totalDistance;
+
+      for (let i = 0; i < distances.length; i++) {
+        if (accumulatedDistance + distances[i] >= targetDistance) {
+          const segmentProgress =
+            (targetDistance - accumulatedDistance) / distances[i];
+
+          const lat =
+            coordinates[i][0] +
+            segmentProgress * (coordinates[i + 1][0] - coordinates[i][0]);
+          const lng =
+            coordinates[i][1] +
+            segmentProgress * (coordinates[i + 1][1] - coordinates[i][1]);
+
+          return [lat, lng];
+        }
+
+        accumulatedDistance += distances[i];
+      }
+
+      return coordinates[coordinates.length - 1];
+    },
+    getRotationAngle(p1, p2) {
+      return (
+        (Math.atan2(p2.lat - p1.lat, p1.lng - p2.lng) * 180) / Math.PI - 180
+      );
+    },
+  },
+  beforeDestroy() {
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+    }
+    if (this.arrowMarkerInstance) {
+      this.arrowMarkerInstance.remove();
+    }
   },
 };
 </script>
