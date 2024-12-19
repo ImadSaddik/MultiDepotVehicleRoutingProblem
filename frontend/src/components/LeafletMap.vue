@@ -262,9 +262,9 @@ export default {
         location.longitude,
       ]);
 
-      this.drawSegment(coordinates, layer);
+      this.drawSegment(coordinates, layer, segment);
     },
-    drawSegment(coordinates, layer) {
+    drawSegment(coordinates, layer, segment = null) {
       const polylineBorder = L.polyline(coordinates, {
         color: "#000000",
         weight: 9,
@@ -279,6 +279,21 @@ export default {
         stroke: true,
         color: "#FFA500",
       });
+
+      if (segment) {
+        const minutes = Math.floor(segment.duration / 60);
+        const seconds = Math.floor(segment.duration % 60);
+        const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        const tooltipContent = `
+          <strong>Segment info</strong><br>
+          Distance: ${segment.distance} m<br>
+          Duration: ${formattedDuration} min<br>
+          From Node ID: ${segment.source_node_id}<br>
+          To Node ID: ${segment.destination_node_id}
+        `;
+        polyline.bindTooltip(tooltipContent, { sticky: true });
+      }
 
       this.addArrowsToSegment(polyline, layer);
 
