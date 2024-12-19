@@ -25,7 +25,7 @@ app.add_middleware(
 
 
 @app.post("/api/v1/optimize/")
-def optimize_route() -> OptimizeResponse:
+def optimize_route(solver_method: str) -> OptimizeResponse:
     connection, cursor = _connect_to_postgres()
     bus_nodes, employee_nodes, company_node = _get_nodes(cursor=cursor)
 
@@ -38,7 +38,8 @@ def optimize_route() -> OptimizeResponse:
         employees_to_bus_clusters=employees_to_bus_clusters,
         company_node=company_node,
         cursor=cursor,
-        redis_client=redis_client
+        redis_client=redis_client,
+        solver_method=solver_method
     )
 
     redis_client.set("optimization_progress", 100)

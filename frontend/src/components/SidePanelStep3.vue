@@ -29,6 +29,12 @@
     />
 
     <ProgressBar :value="optimizationProgress" class="progress-bar" v-show="isSolving" />
+    <div v-show="isSolving && optimizationDuration && !isResultAvailable" class="timer">
+      {{ formattedDuration }}
+    </div>
+    <div v-if="!isSolving && optimizationDuration && isResultAvailable" class="completion-message">
+      The optimization took {{ formattedDuration }}
+    </div>
 
     <Toast position="bottom-left" />
 
@@ -90,7 +96,17 @@ export default {
       POLLING_DURATION_MS: 100,
       COMPLETION_PERCENTAGE: 100,
       TOAST_DURATION: 5000,
+      optimizationDuration: 0,
+      timerInterval: null,
     };
+  },
+  computed: {
+    formattedDuration() {
+      const hours = String(Math.floor(this.optimizationDuration / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((this.optimizationDuration % 3600) / 60)).padStart(2, '0');
+      const seconds = String(this.optimizationDuration % 60).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    },
   },
   methods: {
     goToNextStep() {
@@ -110,19 +126,23 @@ export default {
         });
         return;
       }
+      this.optimizationDuration = 0;
+      this.isResultAvailable = false;
       this.isSolverInvalid = false;
       this.isSolving = true;
+      this.startTimer();
 
       await this.resetOptimizationProgress();
       this.fetchOptimizationProgress();
 
-      const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize/`;
+      const endpointUrl = `${axios.defaults.baseURL}/api/v1/optimize?solver_method=${this.selectedSolver["value"]}`;
       await axios
         .post(endpointUrl)
         .then((response) => {
           this.store.setOptimizedData(response.data.data);
           this.isResultAvailable = true;
           this.isSolving = false;
+          this.stopTimer();
 
           this.$toast.add({
             severity: "success",
@@ -134,6 +154,7 @@ export default {
         .catch((error) => {
           this.isResultAvailable = false;
           this.isSolving = false;
+          this.stopTimer();
 
           this.$toast.add({
             severity: "error",
@@ -142,6 +163,15 @@ export default {
             life: this.TOAST_DURATION,
           });
         });
+    },
+    startTimer() {
+      this.timerInterval = setInterval(() => {
+        this.optimizationDuration++;
+      }, 1000);
+    },
+    stopTimer() {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
     },
     async fetchOptimizationProgress() {
       try {
@@ -209,5 +239,13 @@ export default {
 .progress-bar {
   margin-top: 1rem;
   height: 1.5rem;
+}
+
+.timer {
+  margin-top: 1rem;
+}
+
+.completion-message {
+  margin-top: 1rem;
 }
 </style>

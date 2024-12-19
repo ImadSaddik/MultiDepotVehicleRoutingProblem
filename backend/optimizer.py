@@ -4,7 +4,12 @@ from typing import List, Tuple
 from psycopg2.extensions import cursor
 
 from networkx import DiGraph
-from networkx.algorithms.approximation import traveling_salesman_problem, greedy_tsp
+from networkx.algorithms.approximation import (
+    greedy_tsp,
+    simulated_annealing_tsp,
+    threshold_accepting_tsp,
+    traveling_salesman_problem,
+)
 
 from graph import get_connected_graph
 from models import RouteSegment, OptimizeResponse, Node, ClusterData
@@ -22,7 +27,8 @@ def get_optimized_routes(
     employees_to_bus_clusters: dict,
     company_node: Node,
     cursor: cursor,
-    redis_client: Redis
+    redis_client: Redis,
+    solver_method: str
 ) -> OptimizeResponse:
     optimized_routes = []
     total_clusters = len(employees_to_bus_clusters)
@@ -50,7 +56,7 @@ def get_optimized_routes(
 
         sub_graph_nodes = [bus_node] + assigned_employee_nodes + [company_node]
         G = get_connected_graph(nodes=sub_graph_nodes, cursor=cursor)
-        shortest_path = _find_shortest_path(G)
+        shortest_path = _find_shortest_path(G, solver_method)
         shortest_path = make_shortest_path_with_unique_nodes(shortest_path)
 
         route_segments = _get_route_segments(
@@ -73,17 +79,34 @@ def get_optimized_routes(
     return OptimizeResponse(status="success", data=optimized_routes)
 
 
-def _find_shortest_path(G: DiGraph) -> List[int]:
+def _find_shortest_path(G: DiGraph, solver_method: str) -> List[int]:
     node_indices = list(G.nodes)
     start_node_index = node_indices[0]  # Source (Bus node index)
     end_node_index = node_indices[-1]   # Sink (Company node index)
 
     intermediate_node_indices = node_indices[:-1]  # Bus node + Employee nodes
-    tsp_path = traveling_salesman_problem(
-        G.subgraph(intermediate_node_indices),
-        cycle=False,
-        method=greedy_tsp
-    )
+    
+    solver = {
+        "greedy_tsp": greedy_tsp,
+        "simulated_annealing_tsp": simulated_annealing_tsp,
+        "threshold_accepting_tsp": threshold_accepting_tsp
+    }
+    selected_solver = solver.get(solver_method, greedy_tsp)
+    print(f"Using {selected_solver} solver")
+
+    if solver_method in ["simulated_annealing_tsp", "threshold_accepting_tsp"]:
+        tsp_path = traveling_salesman_problem(
+            G.subgraph(intermediate_node_indices),
+            cycle=False,
+            method=selected_solver,
+            init_cycle="greedy"
+        )
+    else:
+        tsp_path = traveling_salesman_problem(
+            G.subgraph(intermediate_node_indices),
+            cycle=False,
+            method=selected_solver,
+        )
 
     # Rearrange the path to ensure it starts at the bus node
     if tsp_path[0] != start_node_index:
