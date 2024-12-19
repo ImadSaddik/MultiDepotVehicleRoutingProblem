@@ -28,13 +28,29 @@
       @click="startSolver"
     />
 
-    <ProgressBar :value="optimizationProgress" class="progress-bar" v-show="isSolving" />
-    <div v-show="isSolving && optimizationDuration && !isResultAvailable" class="timer">
-      {{ formattedDuration }}
-    </div>
-    <div v-if="!isSolving && optimizationDuration && isResultAvailable" class="completion-message">
-      The optimization took {{ formattedDuration }}
-    </div>
+    <Transition name="fade">
+      <ProgressBar
+        :value="optimizationProgress"
+        class="progress-bar"
+        v-if="isSolving"
+      />
+    </Transition>
+    <Transition name="fade">
+      <div
+        v-show="isSolving || (optimizationDuration && !isResultAvailable)"
+        class="timer"
+      >
+        {{ formattedDuration }}
+      </div>
+    </Transition>
+    <Transition name="fade">
+      <div
+        v-if="!isSolving && optimizationDuration && isResultAvailable"
+        class="completion-message"
+      >
+        The optimization took {{ formattedDuration }}
+      </div>
+    </Transition>
 
     <Toast position="bottom-left" />
 
@@ -102,9 +118,13 @@ export default {
   },
   computed: {
     formattedDuration() {
-      const hours = String(Math.floor(this.optimizationDuration / 3600)).padStart(2, '0');
-      const minutes = String(Math.floor((this.optimizationDuration % 3600) / 60)).padStart(2, '0');
-      const seconds = String(this.optimizationDuration % 60).padStart(2, '0');
+      const hours = String(
+        Math.floor(this.optimizationDuration / 3600)
+      ).padStart(2, "0");
+      const minutes = String(
+        Math.floor((this.optimizationDuration % 3600) / 60)
+      ).padStart(2, "0");
+      const seconds = String(this.optimizationDuration % 60).padStart(2, "0");
       return `${hours}:${minutes}:${seconds}`;
     },
   },
@@ -247,5 +267,14 @@ export default {
 
 .completion-message {
   margin-top: 1rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
