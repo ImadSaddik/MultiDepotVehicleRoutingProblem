@@ -328,7 +328,17 @@ export default {
       }
     },
     handleStepChange(step) {
+      if (this.animationFrame) {
+        cancelAnimationFrame(this.animationFrame);
+        this.animationFrame = null;
+      }
+      if (this.arrowMarkerInstance) {
+        this.arrowMarkerInstance.remove();
+        this.arrowMarkerInstance = null;
+      }
+
       this.hideAllLayers();
+      console.log(`Switched to side panel step: ${step}`);
 
       switch (step) {
         case 2:
@@ -483,9 +493,11 @@ export default {
   beforeDestroy() {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = null;
     }
     if (this.arrowMarkerInstance) {
       this.arrowMarkerInstance.remove();
+      this.arrowMarkerInstance = null;
     }
   },
 };
