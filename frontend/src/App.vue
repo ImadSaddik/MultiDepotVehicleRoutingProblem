@@ -12,6 +12,10 @@ h1 {
   margin: 0;
 }
 
+h1, h2, p, label {
+  color: var(--p-select-color);
+}
+
 .step-container {
   height: 100%;
   width: 100%;
