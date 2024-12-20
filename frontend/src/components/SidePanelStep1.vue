@@ -106,7 +106,6 @@
     <Dialog
       header="Employee data"
       v-model:visible="showEmployeeDialog"
-      maximizable
       :modal="true"
       :draggable="false"
       :resizable="false"
@@ -133,7 +132,6 @@
     <Dialog
       header="Bus data"
       v-model:visible="showBusDialog"
-      maximizable
       :modal="true"
       :draggable="false"
       :resizable="false"
