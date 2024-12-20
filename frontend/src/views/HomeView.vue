@@ -7,11 +7,21 @@
     :showEmployees="showEmployees"
     :showBuses="showBuses"
   />
-  <Button 
-    :icon="isSidePanelOpen ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" 
-    class="toggle-button" 
-    @click="toggleSidePanelVisibility" 
-  />
+
+  <div class="action-buttons">
+    <Button 
+      :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
+      class="theme-button" 
+      @click="toggleAppTheme" 
+    />
+
+    <Button 
+      :icon="isSidePanelOpen ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" 
+      class="toggle-button" 
+      @click="toggleSidePanelVisibility" 
+    />
+  </div>
+
   <transition name="slide-panel" mode="out-in">
     <SidePanel
       v-show="isSidePanelOpen"
@@ -46,7 +56,8 @@ export default {
       routeDisplayMode: {
         showFullRoute: true,
         selectedSegment: 0,
-      }
+      },
+      isDarkMode: false,
     };
   },
   methods: {
@@ -76,11 +87,17 @@ export default {
 </script>
 
 <style scoped>
-.toggle-button {
+.action-buttons {
+  display: flex;
+
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 2000;
+}
+
+.theme-button {
+  margin-right: 1rem;
 }
 
 .slide-panel-enter-active,
