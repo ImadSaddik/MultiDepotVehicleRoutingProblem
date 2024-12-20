@@ -12,7 +12,7 @@
     <Button 
       :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
       class="theme-button" 
-      @click="toggleAppTheme" 
+      @click="toggleDarkMode" 
     />
 
     <Button 
@@ -81,7 +81,11 @@ export default {
     },
     toggleSidePanelVisibility() {
       this.isSidePanelOpen = !this.isSidePanelOpen;
-    }
+    },
+    toggleDarkMode() {
+      this.isDarkMode = !this.isDarkMode;
+      document.documentElement.classList.toggle('my-app-dark');
+    },
   }
 };
 </script>
