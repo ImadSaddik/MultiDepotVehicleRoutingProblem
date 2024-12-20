@@ -37,6 +37,7 @@
 import Button from 'primevue/button';
 import SidePanel from '@/components/SidePanel.vue';
 import LeafletMap from '@/components/LeafletMap.vue';
+import { dataStore } from "@/store/dataStore";
 
 export default {
   name: "HomeView",
@@ -44,6 +45,10 @@ export default {
     Button,
     SidePanel,
     LeafletMap
+  },
+  setup() {
+    const store = dataStore();
+    return { store };
   },
   data() {
     return {
@@ -57,8 +62,12 @@ export default {
         showFullRoute: true,
         selectedSegment: 0,
       },
-      isDarkMode: false,
     };
+  },
+  computed: {
+    isDarkMode() {
+      return this.store.isDarkMode;
+    },
   },
   methods: {
     handleSlicedData(data) {
@@ -83,7 +92,7 @@ export default {
       this.isSidePanelOpen = !this.isSidePanelOpen;
     },
     toggleDarkMode() {
-      this.isDarkMode = !this.isDarkMode;
+      this.store.setIsDarkMode(!this.store.isDarkMode);
       document.documentElement.classList.toggle('my-app-dark');
     },
   }

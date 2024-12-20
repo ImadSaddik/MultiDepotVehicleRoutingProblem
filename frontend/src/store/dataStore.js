@@ -8,6 +8,7 @@ export const dataStore = defineStore("data", {
     sidePanelStep: 1,
     optimizedData: [],
     selectedCluster: 0,
+    isDarkMode: false,
   }),
   actions: {
     setEmployeeData(data) {
@@ -27,6 +28,9 @@ export const dataStore = defineStore("data", {
     },
     setSelectedCluster(cluster) {
       this.selectedCluster = cluster;
+    },
+    setIsDarkMode(value) {
+      this.isDarkMode = value;
     },
   },
 });

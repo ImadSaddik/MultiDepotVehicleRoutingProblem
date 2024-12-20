@@ -40,6 +40,7 @@ export default {
       arrowMarker: null,
       arrowMarkerInstance: null,
       animationFrame: null,
+      tileLayer: null,
     };
   },
   watch: {
@@ -93,11 +94,15 @@ export default {
       },
       deep: true,
     },
+    'store.isDarkMode'(newVal) {
+      this.switchTileLayer(newVal);
+    },
   },
   mounted() {
     this.initializeMap();
     this.initializeIcons();
     this.initializeLayers();
+    this.switchTileLayer(this.store.isDarkMode);
   },
   methods: {
     initializeMap() {
@@ -116,13 +121,20 @@ export default {
 
       this.arrowMarker = encodeURI("data:image/svg+xml;base64," + btoa(svg));
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a>",
-      }).addTo(toRaw(this.map));
       L.control.attribution({ position: "bottomleft" }).addTo(toRaw(this.map));
 
       this.map.on('zoomend', this.updateZoomControls);
+    },
+    switchTileLayer(isDark) {
+      if (this.tileLayer) {
+        this.map.removeLayer(this.tileLayer);
+      }
+      const tileUrl = isDark
+        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+      this.tileLayer = L.tileLayer(tileUrl, {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(this.map);
     },
     initializeIcons() {
       this.employeeIcon = L.divIcon({
