@@ -130,6 +130,18 @@ export default {
   },
   methods: {
     goToNextStep() {
+      if (!this.selectedSolver) {
+        this.isSolverInvalid = true;
+        this.$toast.add({
+          severity: "error",
+          summary: "Validation error",
+          detail: "Please select a solver",
+          life: this.TOAST_DURATION,
+        });
+        return;
+      }
+
+      this.isSolverInvalid = false;
       this.$emit("next-step");
     },
     goToPreviousStep() {
