@@ -234,7 +234,8 @@ export default {
           this.routeDisplayMode
         );
         this.drawAllSegments(routeSegments, rawLayer);
-        this.animateArrowAlongRoute(routeSegments, rawLayer);  // Added this line
+        const coordinates = this.getCoordinatesFromSegments(routeSegments);
+        this.animateArrowAlongPath(coordinates, rawLayer);
       } else {
         const selectedSegment = routeSegments[this.routeDisplayMode.selectedSegment];
         const segmentStartingPoint = selectedSegment.coordinates[0];
@@ -245,7 +246,21 @@ export default {
           this.routeDisplayMode
         );
         this.drawSingleSegment(selectedSegment, rawLayer);
+        const coordinates = selectedSegment.coordinates.map((location) => [
+          location.latitude,
+          location.longitude,
+        ]);
+        this.animateArrowAlongPath(coordinates, rawLayer);
       }
+    },
+    getCoordinatesFromSegments(segments) {
+      const coordinates = [];
+      segments.forEach((segment) => {
+        segment.coordinates.forEach((location) => {
+          coordinates.push([location.latitude, location.longitude]);
+        });
+      });
+      return coordinates;
     },
     drawAllSegments(segments, layer) {
       segments.forEach((segment) => {
@@ -266,7 +281,6 @@ export default {
       ]);
 
       this.drawSegment(coordinates, layer, segment);
-      this.animateArrowAlongSegment(coordinates, layer);
     },
     drawSegment(coordinates, layer, segment = null) {
       const polylineBorder = L.polyline(coordinates, {
@@ -375,58 +389,7 @@ export default {
         zoomOutButton.classList.remove('leaflet-disabled');
       }
     },
-    animateArrowAlongSegment(coordinates, layer) {
-      // Create a single arrow marker
-      const arrowMarker = L.marker(coordinates[0], { icon: L.divIcon() }).addTo(layer);
-      this.arrowMarkerInstance = arrowMarker;
-
-      // Calculate the total length of the segment
-      let totalDistance = 0;
-      for (let i = 1; i < coordinates.length; i++) {
-        totalDistance += this.map.distance(coordinates[i - 1], coordinates[i]);
-      }
-
-      const arrowSpeedInMeterPerSecond = 100;
-      const totalDurationInSeconds = totalDistance / arrowSpeedInMeterPerSecond;
-
-      const startTime = performance.now();
-
-      const animate = () => {
-        const currentTime = performance.now();
-        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
-
-        let progress = (elapsedTimeInSeconds % totalDurationInSeconds) / totalDurationInSeconds;
-
-        const latlng = this.interpolatePointOnLine(coordinates, progress);
-        const latlngObject = { lat: latlng[0], lng: latlng[1] };
-        arrowMarker.setLatLng(latlng);
-
-        const nextProgress = (progress + 0.0001) % 1;
-        const nextLatLng = this.interpolatePointOnLine(coordinates, nextProgress);
-        const nextLatLngObject = { lat: nextLatLng[0], lng: nextLatLng[1] };
-        const angle = this.getRotationAngle(latlngObject, nextLatLngObject);
-
-        const arrowIcon = L.divIcon({
-          html: `<div style="
-            width: 28px;
-            height: 28px;
-            background-image: url(${this.arrowMarker});
-            transform: rotate(${angle}deg);
-          "></div>`,
-          className: "arrow-marker",
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-        });
-
-        arrowMarker.setIcon(arrowIcon);
-
-        this.animationFrame = requestAnimationFrame(animate);
-      };
-
-      animate();
-    },
-
-    animateArrowAlongRoute(segments, layer) {
+    animateArrowAlongPath(coordinates, layer) {
       if (this.animationFrame) {
         cancelAnimationFrame(this.animationFrame);
       }
@@ -434,13 +397,6 @@ export default {
         this.arrowMarkerInstance.remove();
       }
 
-      const coordinates = [];
-      segments.forEach(segment => {
-        segment.coordinates.forEach(location => {
-          coordinates.push([location.latitude, location.longitude]);
-        });
-      });
-
       const arrowMarker = L.marker(coordinates[0], { icon: L.divIcon() }).addTo(layer);
       this.arrowMarkerInstance = arrowMarker;
 
@@ -485,7 +441,6 @@ export default {
       };
       animate();
     },
-
     interpolatePointOnLine(coordinates, progress) {
       let totalDistance = 0;
       const distances = [];
