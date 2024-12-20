@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <TransitionGroup
-      :name="animationDirection === 'forward' ? 'slide-left' : 'slide-right'" 
+      :name="animationDirection === 'forward' ? 'slide-left' : 'slide-right'"
       mode="out-in"
     >
       <SidePanelStep1
@@ -49,11 +49,11 @@ export default {
     SidePanelStep1,
     SidePanelStep2,
     SidePanelStep3,
-    SidePanelStep4
+    SidePanelStep4,
   },
   setup() {
-    const store = dataStore()
-    return { store }
+    const store = dataStore();
+    return { store };
   },
   data() {
     return {
@@ -62,7 +62,7 @@ export default {
       busData: [],
       companyLocation: {},
       initialSliderValue: 5,
-      animationDirection: 'forward',
+      animationDirection: "forward",
     };
   },
   methods: {
@@ -75,12 +75,12 @@ export default {
       this.sendSlicedData(this.initialSliderValue, this.initialSliderValue);
     },
     handleNextStep() {
-      this.animationDirection = 'forward';
+      this.animationDirection = "forward";
       this.currentStep++;
       this.store.setSidePanelStep(this.currentStep);
     },
     handlePreviousStep() {
-      this.animationDirection = 'backward';
+      this.animationDirection = "backward";
       this.currentStep--;
       this.store.setSidePanelStep(this.currentStep);
     },

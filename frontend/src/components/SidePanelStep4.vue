@@ -6,32 +6,34 @@
     <h2>Results visualization</h2>
 
     <p>
-      The results are displayed in the map. You can cycle through each bus to see the optimized route.
+      The results are displayed in the map. You can cycle through each bus to
+      see the optimized route.
     </p>
 
     <div class="cluster-selection-buttons">
-      <Button 
+      <Button
         :disabled="selectedCluster === 0"
         icon="pi pi-chevron-left"
         class="toggle-button"
-        @click="showPreviousCluster" 
+        @click="showPreviousCluster"
       />
 
       <p>Bus N° {{ selectedCluster + 1 }}</p>
 
-      <Button 
+      <Button
         :disabled="selectedCluster === store.optimizedData.length - 1"
         icon="pi pi-chevron-right"
-        class="toggle-button" 
-        @click="showNextCluster" 
+        class="toggle-button"
+        @click="showNextCluster"
       />
     </div>
 
     <div class="segment-controls">
-      <p style="margin: 0px;">
-        The route is divided into segments. You can view the full route or view each segment individually.
+      <p style="margin: 0px">
+        The route is divided into segments. You can view the full route or view
+        each segment individually.
       </p>
-      
+
       <div class="segment-mode-toggle">
         <ToggleButton
           v-model="showFullRoute"
@@ -42,20 +44,20 @@
       </div>
 
       <div v-if="!showFullRoute" class="segment-navigation">
-        <Button 
+        <Button
           :disabled="selectedSegment === 0"
           icon="pi pi-chevron-left"
           class="toggle-button"
-          @click="showPreviousSegment" 
+          @click="showPreviousSegment"
         />
 
         <p>Segment {{ selectedSegment + 1 }} of {{ totalSegments }}</p>
 
-        <Button 
+        <Button
           :disabled="selectedSegment === totalSegments - 1"
           icon="pi pi-chevron-right"
-          class="toggle-button" 
-          @click="showNextSegment" 
+          class="toggle-button"
+          @click="showNextSegment"
         />
       </div>
     </div>
@@ -123,11 +125,11 @@
 import { toRaw } from "vue";
 import { dataStore } from "@/store/dataStore";
 
-import Card from 'primevue/card';
+import Card from "primevue/card";
 import Toast from "primevue/toast";
 import Button from "primevue/button";
-import Divider from 'primevue/divider';
-import ToggleButton from 'primevue/togglebutton';
+import Divider from "primevue/divider";
+import ToggleButton from "primevue/togglebutton";
 
 export default {
   name: "SidePanelStep4",

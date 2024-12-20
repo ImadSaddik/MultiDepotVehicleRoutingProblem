@@ -1,5 +1,5 @@
 <template>
-  <LeafletMap 
+  <LeafletMap
     :employeeData="employeeData"
     :busData="busData"
     :companyData="companyData"
@@ -9,16 +9,16 @@
   />
 
   <div class="action-buttons">
-    <Button 
+    <Button
       :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
-      class="theme-button" 
-      @click="toggleDarkMode" 
+      class="theme-button"
+      @click="toggleDarkMode"
     />
 
-    <Button 
-      :icon="isSidePanelOpen ? 'pi pi-chevron-right' : 'pi pi-chevron-left'" 
-      class="toggle-button" 
-      @click="toggleSidePanelVisibility" 
+    <Button
+      :icon="isSidePanelOpen ? 'pi pi-chevron-right' : 'pi pi-chevron-left'"
+      class="toggle-button"
+      @click="toggleSidePanelVisibility"
     />
   </div>
 
@@ -34,9 +34,9 @@
 </template>
 
 <script>
-import Button from 'primevue/button';
-import SidePanel from '@/components/SidePanel.vue';
-import LeafletMap from '@/components/LeafletMap.vue';
+import Button from "primevue/button";
+import SidePanel from "@/components/SidePanel.vue";
+import LeafletMap from "@/components/LeafletMap.vue";
 import { dataStore } from "@/store/dataStore";
 
 export default {
@@ -44,7 +44,7 @@ export default {
   components: {
     Button,
     SidePanel,
-    LeafletMap
+    LeafletMap,
   },
   setup() {
     const store = dataStore();
@@ -93,9 +93,9 @@ export default {
     },
     toggleDarkMode() {
       this.store.setIsDarkMode(!this.store.isDarkMode);
-      document.documentElement.classList.toggle('my-app-dark');
+      document.documentElement.classList.toggle("my-app-dark");
     },
-  }
+  },
 };
 </script>
 

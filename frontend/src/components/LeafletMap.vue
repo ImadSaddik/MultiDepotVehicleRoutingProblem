@@ -94,7 +94,7 @@ export default {
       },
       deep: true,
     },
-    'store.isDarkMode'(newVal) {
+    "store.isDarkMode"(newVal) {
       this.switchTileLayer(newVal);
       this.initializeIcons();
       this.updateArrowMarker();
@@ -118,14 +118,14 @@ export default {
         attributionControl: false,
         zoomSnap: 0.25,
         zoomDelta: 0.5,
-        wheelPxPerZoomLevel: 120, 
+        wheelPxPerZoomLevel: 120,
       }).setView(this.centerCoordinates, this.zoomLevel);
 
       this.updateArrowMarker();
 
       L.control.attribution({ position: "bottomleft" }).addTo(toRaw(this.map));
 
-      this.map.on('zoomend', this.updateZoomControls);
+      this.map.on("zoomend", this.updateZoomControls);
     },
     switchTileLayer(isDark) {
       if (this.tileLayer) {
@@ -135,12 +135,13 @@ export default {
         ? "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
         : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
       this.tileLayer = L.tileLayer(tileUrl, {
-        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        attribution:
+          '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(this.map);
     },
     initializeIcons() {
-      const darkModeClass = this.store.isDarkMode ? 'dark-mode' : '';
-      
+      const darkModeClass = this.store.isDarkMode ? "dark-mode" : "";
+
       this.employeeIcon = L.divIcon({
         html: `
           <div class="marker-background employee-bg ${darkModeClass}">
@@ -253,7 +254,8 @@ export default {
         const coordinates = this.getCoordinatesFromSegments(routeSegments);
         this.animateArrowAlongPath(coordinates, rawLayer);
       } else {
-        const selectedSegment = routeSegments[this.routeDisplayMode.selectedSegment];
+        const selectedSegment =
+          routeSegments[this.routeDisplayMode.selectedSegment];
         const segmentStartingPoint = selectedSegment.coordinates[0];
 
         this.centerMapOnLocation(
@@ -320,7 +322,9 @@ export default {
       if (segment) {
         const minutes = Math.floor(segment.duration / 60);
         const seconds = Math.floor(segment.duration % 60);
-        const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        const formattedDuration = `${minutes}:${seconds
+          .toString()
+          .padStart(2, "0")}`;
 
         const tooltipContent = `
           <strong>Segment info</strong><br>
@@ -402,20 +406,20 @@ export default {
       }
     },
     updateZoomControls() {
-      const zoomInButton = document.querySelector('.leaflet-control-zoom-in');
-      const zoomOutButton = document.querySelector('.leaflet-control-zoom-out');
+      const zoomInButton = document.querySelector(".leaflet-control-zoom-in");
+      const zoomOutButton = document.querySelector(".leaflet-control-zoom-out");
       const currentZoom = this.map.getZoom();
 
       if (currentZoom >= 18) {
-        zoomInButton.classList.add('leaflet-disabled');
+        zoomInButton.classList.add("leaflet-disabled");
       } else {
-        zoomInButton.classList.remove('leaflet-disabled');
+        zoomInButton.classList.remove("leaflet-disabled");
       }
 
       if (currentZoom <= 0) {
-        zoomOutButton.classList.add('leaflet-disabled');
+        zoomOutButton.classList.add("leaflet-disabled");
       } else {
-        zoomOutButton.classList.remove('leaflet-disabled');
+        zoomOutButton.classList.remove("leaflet-disabled");
       }
     },
     animateArrowAlongPath(coordinates, layer) {
@@ -426,7 +430,9 @@ export default {
         this.arrowMarkerInstance.remove();
       }
 
-      const arrowMarker = L.marker(coordinates[0], { icon: L.divIcon() }).addTo(layer);
+      const arrowMarker = L.marker(coordinates[0], { icon: L.divIcon() }).addTo(
+        layer
+      );
       this.arrowMarkerInstance = arrowMarker;
 
       let totalDistance = 0;
@@ -441,14 +447,19 @@ export default {
       const animate = () => {
         const currentTime = performance.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
-        let progress = (elapsedTimeInSeconds % totalDurationInSeconds) / totalDurationInSeconds;
+        let progress =
+          (elapsedTimeInSeconds % totalDurationInSeconds) /
+          totalDurationInSeconds;
 
         const latlng = this.interpolatePointOnLine(coordinates, progress);
         const latlngObject = { lat: latlng[0], lng: latlng[1] };
         arrowMarker.setLatLng(latlng);
 
         const nextProgress = (progress + 0.0001) % 1;
-        const nextLatLng = this.interpolatePointOnLine(coordinates, nextProgress);
+        const nextLatLng = this.interpolatePointOnLine(
+          coordinates,
+          nextProgress
+        );
         const nextLatLngObject = { lat: nextLatLng[0], lng: nextLatLng[1] };
         const angle = this.getRotationAngle(latlngObject, nextLatLngObject);
 

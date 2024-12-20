@@ -1,5 +1,5 @@
 <template>
-  <router-view/>
+  <router-view />
 </template>
 
 <style>
@@ -18,7 +18,10 @@ h1 {
   margin: 0;
 }
 
-h1, h2, p, label {
+h1,
+h2,
+p,
+label {
   color: var(--p-select-color);
 }
 

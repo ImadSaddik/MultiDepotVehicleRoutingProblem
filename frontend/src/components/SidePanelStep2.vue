@@ -12,7 +12,10 @@
     <div class="data-slider-container">
       <p>Employee data</p>
       <div class="toggle-switch-container">
-        <ToggleSwitch v-model="employeeToggleSwitchChecked" @update:modelValue="handleEmployeeToggleSwitchChange" />
+        <ToggleSwitch
+          v-model="employeeToggleSwitchChecked"
+          @update:modelValue="handleEmployeeToggleSwitchChange"
+        />
         <span v-if="employeeToggleSwitchChecked">
           Displaying {{ employeeSliderValue }} employee records
         </span>
@@ -34,7 +37,10 @@
     <div class="data-slider-container">
       <p>Bus data</p>
       <div class="toggle-switch-container">
-        <ToggleSwitch v-model="busToggleSwitchChecked" @update:modelValue="handleBusToggleSwitchChange" />
+        <ToggleSwitch
+          v-model="busToggleSwitchChecked"
+          @update:modelValue="handleBusToggleSwitchChange"
+        />
         <span v-if="busToggleSwitchChecked">
           Displaying {{ busSliderValue }} bus records
         </span>
@@ -57,7 +63,7 @@
 
     <h2>Statistics</h2>
     <p>Here you can see some statistics about the data you uploaded.</p>
-    
+
     <div class="statistics-container">
       <Card class="stat-card">
         <template #header>
@@ -73,7 +79,7 @@
           </div>
         </template>
       </Card>
-  
+
       <Card class="stat-card">
         <template #header>
           <div class="card-header">
@@ -115,7 +121,7 @@ import Button from "primevue/button";
 import Slider from "primevue/slider";
 import Divider from "primevue/divider";
 import ToggleSwitch from "primevue/toggleswitch";
-import Card from 'primevue/card';
+import Card from "primevue/card";
 
 export default {
   name: "SidePanelStep2",
@@ -127,8 +133,8 @@ export default {
     Card,
   },
   setup() {
-    const store = dataStore()
-    return { store }
+    const store = dataStore();
+    return { store };
   },
   computed: {
     maxEmployeeSliderValue() {
@@ -179,7 +185,7 @@ export default {
     },
     handleBusToggleSwitchChange(value) {
       this.$emit("bus-toggle-switch-change", value);
-    }
+    },
   },
   watch: {},
 };
