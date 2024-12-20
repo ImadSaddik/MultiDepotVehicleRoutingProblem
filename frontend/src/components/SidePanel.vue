@@ -117,7 +117,7 @@ export default {
   right: 0;
   bottom: 0;
   width: 25rem;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: var(--p-select-filled-background);
   border-left: 1px solid #adadad;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
