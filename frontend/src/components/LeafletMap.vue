@@ -96,6 +96,14 @@ export default {
     },
     'store.isDarkMode'(newVal) {
       this.switchTileLayer(newVal);
+      this.initializeIcons();
+      this.updateArrowMarker();
+      this.updateEmployeeMarkers();
+      this.updateBusMarkers();
+      this.updateCompanyMarker();
+      if (this.store.sidePanelStep === 4) {
+        this.updateRouteLayer();
+      }
     },
   },
   mounted() {
@@ -113,13 +121,7 @@ export default {
         wheelPxPerZoomLevel: 120, 
       }).setView(this.centerCoordinates, this.zoomLevel);
 
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28">
-          <polyline points="4,4 14,14 4,24" fill="none" stroke="black" stroke-width="3"/>
-        </svg>
-      `;
-
-      this.arrowMarker = encodeURI("data:image/svg+xml;base64," + btoa(svg));
+      this.updateArrowMarker();
 
       L.control.attribution({ position: "bottomleft" }).addTo(toRaw(this.map));
 
@@ -130,16 +132,18 @@ export default {
         this.map.removeLayer(this.tileLayer);
       }
       const tileUrl = isDark
-        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        ? "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
         : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
       this.tileLayer = L.tileLayer(tileUrl, {
-        attribution: "&copy; OpenStreetMap contributors",
+        attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(this.map);
     },
     initializeIcons() {
+      const darkModeClass = this.store.isDarkMode ? 'dark-mode' : '';
+      
       this.employeeIcon = L.divIcon({
         html: `
-          <div class="marker-background employee-bg">
+          <div class="marker-background employee-bg ${darkModeClass}">
             <span class="material-icons">person</span>
           </div>
         `,
@@ -151,7 +155,7 @@ export default {
 
       this.busIcon = L.divIcon({
         html: `
-          <div class="marker-background bus-bg">
+          <div class="marker-background bus-bg ${darkModeClass}">
             <span class="material-icons">directions_bus</span>
           </div>
         `,
@@ -163,7 +167,7 @@ export default {
 
       this.companyIcon = L.divIcon({
         html: `
-          <div class="marker-background company-bg">
+          <div class="marker-background company-bg ${darkModeClass}">
             <span class="material-icons">business</span>
           </div>
         `,
@@ -295,8 +299,11 @@ export default {
       this.drawSegment(coordinates, layer, segment);
     },
     drawSegment(coordinates, layer, segment = null) {
+      const borderColor = this.store.isDarkMode ? "#FFFFFF" : "#000000";
+      const segmentColor = this.store.isDarkMode ? "#2c2c2b" : "#FFA500";
+
       const polylineBorder = L.polyline(coordinates, {
-        color: "#000000",
+        color: borderColor,
         weight: 9,
         opacity: 1,
         smoothFactor: 1.25,
@@ -307,7 +314,7 @@ export default {
         opacity: 1,
         smoothFactor: 1.25,
         stroke: true,
-        color: "#FFA500",
+        color: segmentColor,
       });
 
       if (segment) {
@@ -501,6 +508,15 @@ export default {
         (Math.atan2(p2.lat - p1.lat, p1.lng - p2.lng) * 180) / Math.PI - 180
       );
     },
+    updateArrowMarker() {
+      const arrowColor = this.store.isDarkMode ? "#FFA500" : "black";
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+          <polyline points="4,4 14,14 4,24" fill="none" stroke="${arrowColor}" stroke-width="5"/>
+        </svg>
+      `;
+      this.arrowMarker = encodeURI("data:image/svg+xml;base64," + btoa(svg));
+    },
   },
   beforeDestroy() {
     if (this.animationFrame) {
@@ -543,18 +559,18 @@ export default {
 }
 
 .employee-bg {
-  background: #2196f3;
-  border: 2px solid #1976d2;
+  background: var(--employee-bg);
+  border: 2px solid var(--employee-border);
 }
 
 .bus-bg {
-  background: #4caf50;
-  border: 2px solid #388e3c;
+  background: var(--bus-bg);
+  border: 2px solid var(--bus-border);
 }
 
 .company-bg {
-  background: #f44336;
-  border: 2px solid #d32f2f;
+  background: var(--company-bg);
+  border: 2px solid var(--company-border);
 }
 
 .marker-background .material-icons {
@@ -567,5 +583,20 @@ export default {
 .arrow-marker {
   background: none;
   border: none;
+}
+
+.employee-bg.dark-mode {
+  background: #1976d2;
+  border: 2px solid #1e88e5;
+}
+
+.bus-bg.dark-mode {
+  background: #388e3c;
+  border: 2px solid #43a047;
+}
+
+.company-bg.dark-mode {
+  background: #e53935;
+  border: 2px solid #ef5350;
 }
 </style>

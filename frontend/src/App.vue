@@ -5,6 +5,12 @@
 <style>
 :root {
   font-family: "Roboto Condensed", sans-serif;
+  --employee-bg: #2196f3;
+  --employee-border: #1976d2;
+  --bus-bg: #4caf50;
+  --bus-border: #388e3c;
+  --company-bg: #f44336;
+  --company-border: #d32f2f;
 }
 
 h1 {
